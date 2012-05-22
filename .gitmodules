@@ -1,0 +1,3 @@
+[submodule "ripple"]
+	path = ripple
+	url = git://github.com/riophae/Ripple.git

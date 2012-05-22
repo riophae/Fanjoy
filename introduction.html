@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>有饭同享 :: 入门</title>
+	<link rel="shortcut icon" href="icons/icon-16.png">
+	<link rel="stylesheet" href="lato.css" />
+	<script src="ripple/src/ripple.js"></script>
+	<script src="ripple/src/ripple.helpers.js"></script>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			font-family: Lato, "Lucida Grande", Helvetica, Arial, "Hiragino Sans GB W3", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+			-webkit-font-smoothing: antialiased;
+		}
+		h2 {
+			font-family: Lato, "Lucida Grande", Helvetica, Arial, "Hiragino Sans GB W6", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+		}
+		html {
+			background: url('images/bg.gif');
+			overflow: hidden;
+		}
+		body {
+			padding: 50px;
+			color: #333;
+			font-size: 14px;
+			text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+		}
+		::selection {
+			background: rgba(0, 0, 0, .75);
+			text-shadow: 0 1px 0 rgba(0, 0, 0, .75);
+			color: #f5f5f5;
+		}
+		#wrapper {
+			width: 800px;
+			margin: 0 auto;
+		}
+		h1 {
+			text-align: center;
+			font-size: 24px;
+		}
+		h2 {
+			font-size: 28px;
+			line-height: 36px;
+			padding: 30px 0 5px 0;
+			border-bottom: 1px solid #ccc;
+		}
+		h3 {
+			font-size: 14px;
+			font-weight: 600;
+		}
+		#ext-name {
+			background: url('images/icon-16.png') left center no-repeat;
+			padding-left: 18px;
+			margin-left: 2px;
+		}
+		h3 .comment {
+			color: #999;
+			font-weight: 300;
+		}
+		.left, .right {
+			text-align: center;
+			display: table-cell;
+			line-height: 100px;
+			height: 100px;
+		}
+		.left {
+			color: #999;
+			width: 100px;
+			float: left;
+			clear: left;
+			font-weight: 300;
+		}
+		.left span {
+			vertical-align: middle;
+			color: #333;
+			font-size: 48px;
+			margin-left: 5px;
+		}
+		.right {
+			clear: right;
+			padding-left: 60px;
+			width: 640px;
+			text-align: center;
+			margin: 0 auto;
+			font-size: 18px;
+		}
+		.right ul {
+			display: block;
+			list-style: none;
+			float: left;
+		}
+		.right ul li {
+			float: left;
+			margin: 0 40px;
+		}
+		.right ul li:not(.icon) {
+			margin: 0;
+		}
+		.right ul :first-child {
+			margin-left: 0px;
+		}
+		.right ul li.or {
+			color: #999;
+			display: inline-block;
+			width: 1px;
+			height: 60px;
+			background: #ccc;
+			margin: 20px 0px;
+			overflow: hidden;
+			font-size: 13px;
+		}
+		#step1 #selected {
+			height: 28px;
+			line-height: 28px;
+			padding-top: 36px;
+			padding-bottom: 36px;
+		}
+		.right li.icon {
+			background-position: left center;
+			background-repeat: no-repeat;
+			padding-left: 36px;
+		}
+		p {
+			padding: 5px 0;
+			font-size: 14px;
+		}
+		a {
+			border-bottom: 1px solid #333;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<div id="wrapper">
+		<h3>欢迎使用<span id="ext-name">有饭同享</span>! <span class="comment">验证已成功完成, 正在初始化..</span></h3>
+
+		<h2>如何使用?</h2>
+		<div id="directions">
+			<div id="step1">
+				<div class="left">STEP <span>1</span></div>
+				<div class="right">
+					<ul>
+						<li>在</li>
+						<li class="icon" style="background-image: url(images/select.png);" id="selected">选中的一段文字</li>
+						<li class="or"></li>
+						<li class="icon" style="background-image: url(images/image.png);">图片</li>
+						<li class="or"></li>
+						<li class="icon" style="background-image: url(images/link.png); background-position: 0 36px;">链接</li>
+						<li>上面...</li>
+					</ul>
+				</div>
+			</div>
+			<div id="step2">
+				<div class="left">STEP <span>2</span></div>
+				<div class="right">
+					<ul>
+						<li class="icon" style="background-image: url(images/mouse-right.png);">按住鼠标右键向右拖拽</li>
+						<li class="or"></li>
+						<li class="icon" style="background-image: url(images/menu.png);">按右键, 显示上下文菜单</li>
+					</ul>
+				</div>
+			</div>
+			<div id="step3">
+				<div class="left">STEP <span>3</span></div>
+				<div class="right">
+					<ul>
+						<li class="icon" style="background-image: url(images/happy.png);">有饭同享!</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<h2>有何意见?</h2>
+		<p>目前有饭同享还不够稳定, 但欢迎你<a id="feedback">把问题反馈给我</a>, 我愿意继续完善它!</p>
+		<p>喜欢这个扩展? <a id="recommend">把它推荐给各位饭友</a>吧! :)</p>
+	</div>
+</body>
+<script>
+	var ce = chrome.extension;
+	ce.onMessage = ce.onMessage || ce.onRequest;
+	ce.onMessage.addListener(function(msg) {
+		if (msg.type = 'do' && msg.code) {
+			window.eval(msg.code);
+		}
+	});
+</script>
+<script src="disable.js"></script>
+<script src="content.js"></script>
+<script>
+	var $ = document.getElementById.bind(document);
+	var $$ = function(rule, elem) {
+		return (elem || document).querySelectorAll(rule);
+	}
+
+	var bg_win = chrome.extension.getBackgroundPage();
+	var Ripple = bg_win.Ripple;
+	var Share = bg_win.Share;
+
+	(function select() {
+		var selected = $('selected');
+		var range = document.createRange();
+		var text = selected.childNodes[0];
+		range.setStart(text, 3);
+		range.setEnd(text, 7);
+		window.getSelection().addRange(range);
+	})();
+
+	var wrapper = $('wrapper');
+
+	var check_interval = setInterval(function() {
+		if (! Share.user) return;
+		clearInterval(check_interval);
+
+		var status = $$('h3 .comment')[0];
+		status.style.color = 'green';
+		status.textContent = '已完成初始化.';
+
+		getSettings();
+	}, 16);
+
+	function shareMessage(e, msg) {
+		setCursorPos(e);
+		var port = new Port;
+		port.postMessage('post_details', {
+			type: 'status',
+			status: msg
+		});
+	}
+
+	$('feedback').onclick = function(e) {
+		shareMessage(e, '@锐风 我发现了有饭同享的一个问题:');
+	}
+
+	$('recommend').onclick = function(e) {
+		shareMessage(e, '我正在用 @锐风 开发的有饭同享, 很赞的 Chrome 扩展! 分享网页/图片非常方便!');
+	}
+</script>
+</html>

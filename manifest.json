@@ -1,0 +1,19 @@
+{
+   "background_page": "background.html",
+   "content_scripts": [ {
+      "js": [ "disable.js", "content.js" ],
+      "matches": [ "http://*/*", "https://*/*" ],
+      "run_at": "document_end"
+   } ],
+   "description": "\u901A\u8FC7\u53F3\u952E\u83DC\u5355\u6216\u9F20\u6807\u624B\u52BF\u5206\u4EAB\u9875\u9762/\u56FE\u7247\u5230\u996D\u5426.",
+   "icons": {
+      "128": "images/icon-128.png",
+      "16": "images/icon-16.png",
+      "256": "images/icon-256.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCuFtkJZV+bJsSQXPFKpHLkEYMusFvav50VFSRJZyH5tSFSwaz7OBp1K1ybIgXHVL1x3zGJal/fE7Fv+YPaheYE/QIVCR5tUEuTv+6SbylhifBg9DMBc9A91Bcwqv3n1/ra9zb4rD6iiSl+bc4T9pmXukeN6A+ZLYgpfskGbIT/NQIDAQAB",
+   "name": "\u6709\u996D\u540C\u4EAB",
+   "permissions": [ "tabs", "contextMenus", "http://*/", "https://*/" ],
+   "update_url": "http://clients2.google.com/service/update2/crx",
+   "version": "0.1.0"
+}

@@ -1,0 +1,612 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>有饭同享</title>
+	<link rel="shortcut icon" href="icons/icon-16.png">
+	<style>
+		@-webkit-keyframes blink {
+			from {
+				box-shadow:
+					0 999px 0 rgba(172, 172, 172, 0) inset,
+					0 1px 0 rgba(255, 255, 255, 1) inset,
+					0 1px 0 rgba(0, 0, 0, .09);
+				opacity: 1;
+			}
+			50% {
+				box-shadow:
+					0 999px 0 rgba(172, 172, 172, .2) inset,
+					0 1px 0 rgba(255, 255, 255, 1) inset,
+					0 1px 0 rgba(0, 0, 0, .09);
+				opacity: .75;
+			}
+			to {
+				box-shadow:
+					0 999px 0 rgba(172, 172, 172, 0) inset,
+					0 1px 0 rgba(255, 255, 255, 1) inset,
+					0 1px 0 rgba(0, 0, 0, .09);
+				opacity: 1;
+			}
+		}
+		@-webkit-keyframes slideInFromTop {
+			from {
+				-webkit-transform: translate(0, -30px);
+				opacity: 0;
+			}
+			to {
+				-webkit-transform: translate(0, 0);
+				opacity: 1;
+			}
+		}
+		@-webkit-keyframes slideInFromBottom {
+			from {
+				-webkit-transform: translate(0, 30px);
+				opacity: 0;
+			}
+			to {
+				-webkit-transform: translate(0, 0);
+				opacity: 1;
+			}
+		}
+		@-webkit-keyframes focusInFromBottom {
+			from {
+				-webkit-transform: translate(0, 30px) scale(1.5);
+				opacity: 0;
+			}
+			to {
+				-webkit-transform: translate(0, 0) scale(1);
+				opacity: 1;
+			}
+		}
+		@-webkit-keyframes focusOutFromTop {
+			from {
+				-webkit-transform: translate(0, 0) scale(1);
+				opacity: 1;
+			}
+			to {
+				-webkit-transform: translate(0, 30px) scale(1.5);
+				opacity: 0;
+			}
+		}
+		@-webkit-keyframes fadeIn {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+		@-webkit-keyframes fadeOut {
+			from {
+				opacity: 1;
+			}
+			to {
+				opacity: 0;
+			}
+		}
+		@-webkit-keyframes reveal {
+			0% {
+				-webkit-transform: translate3d(0, 0, 0);
+			}
+			86% {
+				-webkit-transform: translate3d(0, 0, 1px);
+			}
+			100% {
+				-webkit-transform: translate3d(0, 0, 10px);
+			}
+		}
+		@-webkit-keyframes spin {
+			0% {
+				-webkit-transform: rotate(0deg);
+			}
+			50% {
+				-webkit-transform: rotate(180deg);
+			}
+			100% {
+				-webkit-transform: rotate(360deg);
+			}
+		}
+		@-webkit-keyframes animate-stripes {
+			0% {
+				background-position: 0 0;
+			}
+			100% {
+				background-position: 60px 0;
+			}
+		}
+		html, body, div, select, h2, p {
+			margin: 0;
+			padding: 0;
+			font: 12px "Lucida Grande", "Helvetica Neue", Helvetica, Arial, sans-serif;
+		}
+		html {
+			overflow: hidden;
+			background: url('images/bg.gif');
+		}
+		body {
+			color: #333;
+			text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+			background: -webkit-gradient(
+				linear, left top, left bottom,
+				from(rgba(0, 0, 0, 0)),
+				color-stop(.5, rgba(102, 102, 102, .1)),
+				color-stop(.75, rgba(191, 191, 191, .3)),
+				to(rgba(255, 255, 255, .5))
+			);
+		}
+		h2 {
+			font-size: 13px;
+			margin: 0 0 3px 0;
+			text-shadow: 0 0 10px rgba(255, 255, 255, .75);
+		}
+		::-webkit-scrollbar {
+			width: 6px;
+			height: 6px;
+			padding: 0 1px 1px 0;
+		}
+		::-webkit-scrollbar-button,
+		::-webkit-scrollbar-corner,
+		::-webkit-scrollbar-resizer {
+			display: none;
+		}
+		::-webkit-scrollbar-track,
+		::-webkit-scrollbar-track-piece {
+			background: transparent;
+		}
+		::-webkit-scrollbar-thumb {
+			background-color: #333;
+			border-radius: 2px;
+			box-shadow: 1px 1px 0 rgba(255, 255, 255, .1) inset;
+			border-right: 1px solid rgba(0, 0, 0, .5);
+			border-bottom: 1px solid rgba(0, 0, 0, .5);
+		}
+		::selection {
+			background: rgba(0, 0, 0, .75);
+			text-shadow: 0 1px 0 rgba(0, 0, 0, .75);
+			color: #f5f5f5;
+		}
+		.fadeIn {
+			-webkit-animation: fadeIn .2s ease-in-out;
+		}
+		.fadeOut {
+			-webkit-animation: fadeOut .2s ease-in-out;
+		}
+		.focusOutFromTop {
+			-webkit-transform-origin: top center;
+			-webkit-animation: focusOutFromTop .15s ease-out;
+		}
+		.focusInFromBottom {
+			-webkit-transform-origin: top center;
+			-webkit-animation: focusInFromBottom .15s ease-in;
+		}
+		#wrapper {
+			padding: 5px 10px;
+			background: -webkit-gradient(
+				linear, left top, left bottom,
+				from(rgba(255, 255, 255, .25)),
+				color-stop(.5, rgba(255, 255, 255, .01)),
+				color-stop(.5, transparent),
+				to(transparent)
+			);
+		}
+		.overlay {
+			display: none;
+			position: absolute;
+			z-index: 100;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			color: #fff;
+			text-shadow: none;
+			background: rgba(0, 0, 0, .85);
+			box-sizing: border-box;
+			margin: 0;
+			padding: 10px;
+		}
+		.overlay ::selection {
+			color: #fff;
+			background: rgba(82, 168, 236, .25);
+			background: rgba(255, 255, 255, .25);
+		}
+		.overlay a {
+			color: #bbb;
+			text-decoration: underline;
+		}
+		#about .hide {
+			-webkit-transform: translateX(-26px);
+		}
+		.arrow {
+			margin: 0 5px;
+			color: #aaa;
+		}
+		li, li .comment {
+			list-style: none;
+			clear: both;
+			padding: 0 0 4px 0;
+			margin: 0;
+		}
+		li .comment {
+			color: #bbb;
+			padding-top: 1px;
+			padding-left: 16px;
+			display: block;
+		}
+		#options [type="checkbox"] {
+			float: left;
+			margin: 3px 4px 0 0;
+		}
+		#templateCode {
+			border-radius: 2px;
+			border: none;
+			margin: 5px 0;
+			width: 100%;
+			background: transparent;
+			border-bottom: 1px solid #fff;
+			color: #bbb;
+			outline: none !important;
+			font: 11px "Lucida Grande", "Helvetica Neue", Helvetica, Verdana, Tahoma;
+		}
+		#availableKeys {
+			float: right;
+			clear: right;
+		}
+		.hide {
+			margin: 3px;
+			width: 24px;
+			height: 24px;
+			position: absolute;
+			z-index: 200;
+			bottom: 7px;
+			right: 7px;
+			background: url('images/hide.png') center center;
+		}
+		#accountDetails {
+			-webkit-animation: slideInFromTop .2s ease-in-out;
+			height: 30px;
+			line-height: 30px;
+		}
+		#accountDetails:hover #logout {
+			opacity: 1;
+		}
+		#accountDetails > * {
+			float: left;
+			display: inline-block;
+			height: 24px;
+		}
+		#avatarWrapper, #avatar, #avatarWrapper::before {
+			width: 24px;
+			height: 24px;
+			border: none;
+			border-radius: 5px;
+		}
+		#avatarWrapper {
+			margin: 3px 3px 3px 0;
+			position: relative;
+		}
+		#avatarWrapper::before {
+			content: " ";
+			position: absolute;
+			z-index: 1;
+			left: 0;
+			top: 0;
+			box-shadow:
+				0 2px 5px rgba(0, 0, 0, .25) inset,
+				0 1px 0 rgba(255, 255, 255, .5);
+		}
+		#userName {
+			font-size: 14px;
+			font-family: "Lucida Grande", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB W3", "\5FAE\8F6F\96C5\9ED1", sans-serif;
+			-webkit-font-smoothing: antialiased;
+			-webkit-mask-image:
+				-webkit-gradient(
+					linear,
+					left top,
+					left bottom,
+					from(rgba(0, 0, 0, .7)),
+					color-stop(.5, rgba(0, 0, 0, .75)),
+					color-stop(.5, rgba(0, 0, 0, .9)),
+					to(rgba(0, 0, 0, .95))
+				);
+		}
+		#logout {
+			margin: 2px;
+			opacity: 0;
+		}
+		#main {
+			padding: 5px;
+			margin: 5px 0;
+			border-radius: 3px;
+			background: rgba(0, 0, 0, .05);
+			box-shadow:
+				0 0 0 0 #c9c9c9,
+				0 2px 2px 0 rgba(0, 0, 0, .07) inset,
+				0 -1px 0 0 #e5e5e5 inset;
+		}
+		#inner {
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+		body.default #inputArea {
+			height: 45px !important;
+			content: " " !important;
+			overflow: hidden;
+		}
+		#inputArea {
+			word-wrap: break-word;
+			padding: 0 5px 0 0;
+			color: #888;
+			line-height: 15px;
+			outline: none;
+			-webkit-transition: color .2s ease-in;
+		}
+		#inputArea[contenteditable] {
+			color: inherit;
+		}
+		body.default #showArea {
+			display: none !important;
+		}
+		#showArea {
+			display: none;
+			float: right;
+			position: relative;
+			border-radius: 3px;
+			line-height: 100%;
+			margin-left: 5px;
+			overflow: hidden;
+		}
+		#showArea img {
+			max-width: 100px;
+			max-height: 100px;
+			border-radius: 3px;
+			box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+		}
+		#showArea::before {
+			z-index: 10;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			border-radius: 3px;
+			left: 0;
+			top: 0;
+			content: " ";
+			box-shadow: 0 1px 1px 0 rgba(255, 255, 255, .5) inset;
+		}
+		#operations {
+			-webkit-animation: slideInFromBottom .2s ease-in-out;
+			width: 100%;
+			clear: both;
+			height: 30px;
+			position: relative;
+		}
+		#operations a {
+			width: 24px;
+			height: 24px;
+			float: right;
+			display: inline-block;
+		}
+		button, #logout, #showOptions, #showAbout {
+			-webkit-transition-property: box-shadow, opacity, background, width;
+			-webkit-transition-duration: .2s;
+			border: 1px solid transparent;
+			border-radius: 3px;
+		}
+		button, #logout:hover, #showOptions:hover, #showAbout:hover {
+			background:
+				-webkit-gradient(
+					linear,
+					left bottom,
+					left top,
+					color-stop(0, #ebebeb),
+					color-stop(.5, #ececec),
+					color-stop(.5, #f3f3f3),
+					color-stop(1, #fff)
+				);
+			border: 1px solid #9a9a9a;
+			border: 1px solid #bbb;
+			box-shadow:
+				0 1px 0 rgba(255, 255, 255, .75) inset,
+				0 1px 0 rgba(0, 0, 0, .09);
+		}
+		button {
+			font-size: 12px;
+			margin: 3px 0;
+			padding: 0 5px;
+			height: 24px;
+			line-height: 20px;
+			color: #333;
+			text-shadow: 0px 1px 0 rgba(255, 255, 255, .25);
+			-webkit-user-select: none;
+			white-space: nowrap;
+			display: inline-block;
+		}
+		button.disabled {
+			pointer-events: none;
+			opacity: .75;
+		}
+		button:hover {
+			box-shadow:
+				0 999px 0 rgba(172, 172, 172, .2) inset,
+				0 1px 0 rgba(255, 255, 255, 1) inset,
+				0 1px 0 rgba(0, 0, 0, .09);
+		}
+		button.loading {
+			-webkit-animation-name: blink;
+			-webkit-animation-timing-function: ease-in-out;
+			-webkit-animation-iteration-count: infinite;
+			-webkit-animation-duration: .75s;
+		}
+		button:focus {
+			outline: none;
+			border-color: rgba(83, 186, 237, 1);
+			box-shadow: 0 0 8px rgba(83, 186, 237, .6);
+		}
+		button:active, #logout:active, #showOptions:active, #showAbout:active {
+			border-top-color: #5a5caf;
+			border-bottom-color: #52536f;
+			border-left-color: #56578f;
+			border-right-color: #56578f;
+			background:
+				-webkit-gradient(
+					linear,
+					left bottom,
+					left top,
+					color-stop(0, #d3f7fd),
+					color-stop(.5, #87c5fb),
+					color-stop(.5, #a1d1f9),
+					color-stop(1, #d4e9fc)
+				);
+			box-shadow:
+				0 999px 0 rgba(0, 115, 215, .3) inset,
+				0 1px 0 rgba(255, 255, 255, 1) inset,
+				0 1px 0 rgba(0, 0, 0, .09);
+			-webkit-animation-name: none;
+		}
+		#counter {
+			-webkit-transition-property: color;
+			-webkit-transition-duration: .2s;
+			color: #999;
+			display: inline-block;
+			line-height: 30px;
+			width: 25px;
+			text-align: center;
+		}
+		#counter.warn {
+			opacity: .5;
+			color: red;
+		}
+		#counter.error {
+			color: red;
+			opacity: .9;
+		}
+		#logout span, #showOptions span, #showAbout span {
+			width: 24px;
+			height: 24px;
+			background-position: center center;
+			content: " ";
+			display: inline-block;
+		}
+		#logout span {
+			background-image: url('images/logout.png');
+		}
+		#showOptions span {
+			background-image: url('images/options.png');
+		}
+		#showAbout span {
+			background-image: url('images/about.png');
+		}
+		#progress {
+			position: absolute;
+			left: 0;
+			top: 0;
+			height: 2px;
+			background-color: rgba(255, 255, 255, .01);
+			display: none;
+		}
+		::-webkit-progress-bar {
+			-webkit-transition: background-color .2s;
+		}
+		progress.a::-webkit-progress-bar {
+			background-color: rgba(255, 42, 0, .1);
+		}
+		progress.a::-webkit-progress-value {
+			background-color: rgba(255, 42, 0, .3);
+		}
+		progress.b::-webkit-progress-bar {
+			background-color: rgba(0, 170, 255, .1);
+		}
+		progress.b::-webkit-progress-value {
+			background-color: rgba(0, 170, 255, .3);
+		}
+		progress.c::-webkit-progress-bar {
+			background-color: rgba(136, 204, 0, .1);
+		}
+		progress.c::-webkit-progress-value {
+			background-color: rgba(136, 204, 0, .3);
+		}
+	</style>
+</head>
+<body class="default">
+	<ul id="options" class="overlay">
+		<h2>Options</h2>
+		<a class="hide" title="隐藏"></a>
+		<li>
+			自定义模板:
+			<select id="templateType">
+				<option value="link">链接</option>
+				<option value="selection">选中文字</option>
+				<option value="image">图片</option>
+			</select>
+			<select id="availableKeys">
+				<option selected value="___">备选参数</option>
+				<option value="page_tit">页面标题</option>
+				<option value="page_url">页面地址</option>
+				<option value="link_tit">链接标题</option>
+				<option value="link_desc">链接内容</option>
+				<option value="link_url">链接地址</option>
+				<option value="sel">选中文字</option>
+				<option value="image_url">图片地址</option>
+				<option value="image_desc">图片描述</option>
+			</select>
+			<input type="text" id="templateCode" />
+		</li>
+		<li>
+			<input type="checkbox" id="enableMouseAction" />
+			允许通过
+			<select name="mouseAction" id="mouseAction">
+				<option selected value="rightButtonDrag">拖拽右键</option>
+				<option value="clickMiddleButton">点击滚轮</option>
+			</select>
+			分享
+			<lable class="comment">
+				<input type="checkbox" id="ctrlKey" />同时必须按下 Ctrl 键
+			</lable>
+		</li>
+	</ul>
+	<div id="about" class="overlay">
+		<h2>About</h2>
+		<a class="hide" title="隐藏"></a>
+		<p><strong>有饭同享</strong> ver 0.1.0</p>
+		<p>@锐风 <a href="http://fanfou.com/ruif" target="_blank">http://fanfou.com/ruif</a></p>
+		<p>在图片或选中的文字上, 按住鼠标右键向右拖拽即可分享至饭否. <a href="introduction.html" target="_blank">入门教程</a></p>
+		<p>基于开源项目 <a href="https://github.com/riophae/Ripple" target="_blank">Ripple</a> 开发.</p>
+	</div>
+	<div id="error" class="overlay">
+		<h2>Error</h2>
+		<a class="hide" title="隐藏"></a>
+		<p id="errorMsg"></p>
+	</div>
+	<div id="reset" class="overlay">
+		<h2>Switch</h2>
+		<a class="hide" title="隐藏"></a>
+		<div id="resetInner"></div>
+	</div>
+	<div id="inquiry" class="overlay">
+		<h2>???</h2>
+		<p id="inquiryMsg"></p>
+		<a id="inquiryOK">是</a>&nbsp;/&nbsp;
+		<a id="inquiryNG">否</a>
+	</div>
+	<div id="wrapper">
+		<progress id="progress" class="a" value="0" min="0" max="100"> </progress>
+		<div id="accountDetails">
+			<span id="avatarWrapper"><img id="avatar" src="" /></span>
+			<span id="userName"></span>
+			<a id="logout" title="更换账号"><span></span></a>
+		</div>
+		<div id="main">
+			<div id="inner">
+				<div id="showArea"><img src="images/picture.png" id="pic" /></div>
+				<div id="inputArea" contenteditable="true" autofocus="true"></div>
+			</div>
+		</div>
+		<div id="operations">
+			<button id="button" type="submit" title="分享">Share!</button>
+			<span id="counter">140</span>
+			<a id="showOptions" title="设置"><span></span></a>
+			<a id="showAbout" title="关于"><span></span></a>
+		</div>
+	</div>
+</body>
+<script src="popup.js"></script>
+</html>
