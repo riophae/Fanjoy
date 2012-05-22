@@ -53,8 +53,8 @@ function onConnect(page_port) {
 	page_port.onMessage.addListener(function(msg) {
 		switch (msg.type) {
 			// 创建一个分享页面
-			var pos = msg.pos || { x: 200, y: 200 };
 			case 'create_popup':
+				var pos = msg.pos || { x: 200, y: 200 };
 				var options = {
 					url: 'popup.html',
 					width: Share.defaultStyle.winWidth,
