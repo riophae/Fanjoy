@@ -5,8 +5,6 @@
 	<title>有饭同享 :: 入门</title>
 	<link rel="shortcut icon" href="icons/icon-16.png">
 	<link rel="stylesheet" href="lato.css" />
-	<script src="ripple/src/ripple.js"></script>
-	<script src="ripple/src/ripple.helpers.js"></script>
 	<style>
 		* {
 			margin: 0;
@@ -127,6 +125,8 @@
 			font-size: 14px;
 		}
 		a {
+			color: #333;
+			text-decoration: none;
 			border-bottom: 1px solid #333;
 			cursor: pointer;
 		}
@@ -174,7 +174,7 @@
 
 		<h2>有何意见?</h2>
 		<p>目前有饭同享还不够稳定, 但欢迎你<a id="feedback">把问题反馈给我</a>, 我愿意继续完善它!</p>
-		<p>喜欢这个扩展? <a id="recommend">把它推荐给各位饭友</a>吧! :)</p>
+		<p>喜欢这个扩展? <a id="recommend">把它推荐给各位饭友</a>吧! :) 也欢迎你来<a href="http://is.gd/fanjoy" target="_blank">扩展主页</a>, 说说你的意见!</p>
 	</div>
 </body>
 <script>
@@ -198,12 +198,13 @@
 	var Ripple = bg_win.Ripple;
 	var Share = bg_win.Share;
 
-	(function select() {
-		var selected = $('selected');
+	(function() {
 		var range = document.createRange();
-		var text = selected.childNodes[0];
-		range.setStart(text, 3);
-		range.setEnd(text, 7);
+		var text = $('selected').childNodes[0];
+		var keyword = '一段文字';
+		var start_pos = text.textContent.indexOf(keyword);
+		range.setStart(text, start_pos);
+		range.setEnd(text, start_pos + keyword.length);
 		window.getSelection().addRange(range);
 	})();
 
@@ -234,7 +235,7 @@
 	}
 
 	$('recommend').onclick = function(e) {
-		shareMessage(e, '我正在用 @锐风 开发的有饭同享, 很赞的 Chrome 扩展! 分享网页/图片非常方便!');
+		shareMessage(e, '我正在用 @锐风 开发的有饭同享, 很赞的 Chrome 扩展! 分享网页/图片非常方便! http://is.gd/fanjoy');
 	}
 </script>
 </html>
