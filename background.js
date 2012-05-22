@@ -1,8 +1,4 @@
 
-var content_scripts = [
-	'disable.js',
-	'content.js'
-];
 var ce = chrome.extension;
 var ct = chrome.tabs;
 var root_url = ce.getURL('');
@@ -57,6 +53,7 @@ function onConnect(page_port) {
 	page_port.onMessage.addListener(function(msg) {
 		switch (msg.type) {
 			// 创建一个分享页面
+			var pos = msg.pos || { x: 200, y: 200 };
 			case 'create_popup':
 				var options = {
 					url: 'popup.html',
@@ -64,8 +61,8 @@ function onConnect(page_port) {
 					height: Share.defaultStyle.winHeight,
 					focused: true,
 					type: 'panel',
-					left: msg.pos.x,
-					top: msg.pos.y
+					left: pos.x,
+					top: pos.y
 				};
 				chrome.windows.create(options, function(win) {
 					tab_id = win.tabs[0].id;
@@ -87,7 +84,7 @@ function onConnect(page_port) {
 }
 
 function disableAll() {
-	initializeContentScripts(['disable.js']);
+	executeScript('disableSharing();');
 }
 
 function applySettings() {
@@ -139,7 +136,7 @@ function validTab(tab) {
 	if (! tab.url) return false;
 	return tab.url.indexOf('http://') == 0 ||
 		tab.url.indexOf('https://') == 0 ||
-		tab.url.indexOf('file:///') == 0 || false;
+		/*tab.url.indexOf('file:///') == 0 || */false;
 }
 
 function closeTab(id) {
@@ -255,7 +252,12 @@ function initialize() {
 				});
 
 				ct.insertCSS(id, {
-					code: '#retry { text-decoration: underline; } #retry:hover { cursor: pointer; }'
+					code: '#retry {' +
+								'	text-decoration: underline;' +
+								'}' +
+								'#retry:hover {' +
+								'	cursor: pointer;' +
+								'}'
 				});
 			});
 
@@ -313,21 +315,12 @@ function reset() {
 	initialize();
 }
 
-function initializeContentScripts(files) {
+function initializeContentScripts() {
 	broadcast(function(tab_id) {
-		loadContentScripts(tab_id, files)
-	});
-}
-
-function loadContentScripts(tab_id, files) {
-	// 异步加载多个 content script
-	(function load(i) {
 		ct.executeScript(tab_id, {
-			file: files[i++]
-		}, function() {
-			if (files[i]) load(i);
+			file: 'content.js'
 		});
-	})(0)
+	});
 }
 
 function executeScript(code) {
@@ -416,4 +409,4 @@ var Share = this.Share = {
 settings.current = Share.getSettings();
 
 initialize();
-initializeContentScripts(content_scripts);
+initializeContentScripts();

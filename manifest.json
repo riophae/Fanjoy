@@ -1,7 +1,7 @@
 {
    "background_page": "background.html",
    "content_scripts": [ {
-      "js": [ "disable.js", "content.js" ],
+      "js": [ "content.js" ],
       "matches": [ "http://*/*", "https://*/*" ],
       "run_at": "document_end"
    } ],

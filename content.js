@@ -7,12 +7,25 @@ var dragging = false;
 var cursor_pos = {};
 var source, selection;
 
+var settings = {};
+
 var image_types = {
 	'jpeg': 'image/jpeg',
 	'jpg': 'image/jpeg',
 	'png': 'image/png',
 	'gif': 'image/gif'
 };
+
+function disableSharing() {
+	var disabled = {
+		enableGesture: false,
+		enableMidButton: false,
+		ctrlKey: false
+	};
+	for (var key in disabled) {
+		settings[key] = disabled[key];
+	}
+}
 
 function setCursorPos(e) {
 	cursor_pos.x = e.screenX + 20;
@@ -88,7 +101,7 @@ function shareImage(url) {
 	var port = new Port;
 	port.postMessage('post_details', {
 		type: 'image',
-		img_desc: (source || {}).alt,
+		img_desc: source.alt,
 		img_url: src
 	});
 
@@ -250,6 +263,7 @@ function getSettings() {
 		type: 'get_settings'
 	});
 }
+disableSharing();
 getSettings();
 
 de.addEventListener('mousedown', onMouseDown, false);
@@ -270,6 +284,7 @@ de.addEventListener('contextmenu', onContextMenu, false);
 		de.removeEventListener('contextmenu', onContextMenu, false);
 	}, false);
 })();
+
 
 // todo: 右键菜单事件
 

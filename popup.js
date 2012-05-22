@@ -659,15 +659,11 @@ w.addEventListener('resize', function(e) {
 }, false);
 
 w.addEventListener('paste', function (e) {
-	if (/text\/html/.test(e.clipboardData.types)) {
-		var data = e.clipboardData.getData('text/html');
-	} else {
-		return;
-	}
+	if (! /text\/html/.test(e.clipboardData.types)) return;
 	e.preventDefault();
 
 	var div = document.createElement('div');
-	div.innerHTML = data;
+	div.innerHTML = e.clipboardData.getData('text/html');
 	var text = div.textContent.clear();
 
 	var selection = w.getSelection();
