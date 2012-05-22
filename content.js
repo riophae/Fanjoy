@@ -7,6 +7,9 @@ var dragging = false;
 var cursor_pos = {};
 var source, selection;
 
+var mouse_status = {}, last_status = {};
+resetMouseStatus();
+
 var settings = {};
 
 var image_types = {
@@ -16,20 +19,59 @@ var image_types = {
 	'gif': 'image/gif'
 };
 
+function mixin(to, from) {
+	for (var key in from) {
+		if (from[key] instanceof Object)
+			to[key] = mixin(to[key] instanceof Object ? to[key] : {}, from[key]);
+		else if (from[key] instanceof Array)
+			to[key] =	from[key].slice(0);
+		else
+			to[key] = from[key];
+	}
+	return to;
+}
+
 function disableSharing() {
 	var disabled = {
 		enableGesture: false,
 		enableMidButton: false,
 		ctrlKey: false
 	};
-	for (var key in disabled) {
-		settings[key] = disabled[key];
-	}
+	mixin(settings, disabled);
+}
+
+function endSharing() {
+	resetMouseStatus();
+	source = null;
+	selection = '';
+	dragging = false;
 }
 
 function setCursorPos(e) {
 	cursor_pos.x = e.screenX + 20;
 	cursor_pos.y = e.screenY + 20;
+}
+
+function setStatus(event) {
+	last_status = mouse_status;
+	mouse_status = {
+		button: event.button,
+		ctrl: event.ctrlKey,
+		type: event.type,
+		pos: {
+			x: event.screenX,
+			y: event.screenY
+		}
+	};
+}
+
+function resetMouseStatus() {
+	setStatus({
+		button: -1,
+		screenX: 0,
+		screenY: 0
+	});
+	last_status = mixin({}, mouse_status);
 }
 
 var Port = function() {
@@ -74,9 +116,7 @@ Port.prototype = {
 				listener.call(this, msg);
 			}
 			this.onCreated.created = true;
-			dragging = false;
-			source = null;
-			selection = '';
+			endSharing();
 		}
 	},
 	addListener: function(listener) {
@@ -186,21 +226,36 @@ function shareLink(link) {
 }
 
 function onMouseDown(e) {
-	if (dragging) return;
-	dragging = false;
-	if (! settings.enableGesture) return;
-	if (settings.ctrlKey !== e.ctrlKey) return;
+	if (dragging) {
+		if (mouse_status.type !== 'mousedown') {
+			endSharing();
+			return;
+		}
+		e.preventDefault();
+		e.stopPropagation();
+		return;
+	}
+	setStatus(e);
+	if (! settings.enableGesture ||
+		settings.ctrlKey !== e.ctrlKey) {
+			return endSharing();
+	}
+	//if (dragging) return;
+	//dragging = false;
 
 	source = e.target;
 	// 接受的拖拽来源: img/canvas/a, 或者选中了文本
 	if (['img', 'canvas', 'a'].indexOf(source.tagName.toLowerCase()) === -1 &&
 		! window.getSelection().toString()) {
-		source = null;
+		endSharing();
 		return;
 	}
 
 	if (e.ctrlKey) e.preventDefault();
-	e.stopPropagation();
+	if (e.button === 2 ||
+		(e.button === 1 && settings.enableMidButton)) {
+		e.stopPropagation();
+	}
 
 	dragging = true;
 	// 记录鼠标坐标
@@ -208,6 +263,8 @@ function onMouseDown(e) {
 }
 
 function onMouseUp(e) {
+	if (e.button !==0) setTimeout(endSharing, 0);
+	setStatus(e);
 	if (settings.ctrlKey !== e.ctrlKey) return;
 	if (settings.enableMidButton) {
 		if (e.button !== 1) return;
@@ -220,7 +277,6 @@ function onMouseUp(e) {
 		dragging = false;
 		return;
 	}
-	e.preventDefault();
 	e.stopPropagation();
 
 	setCursorPos(e);
@@ -248,6 +304,8 @@ function onMouseUp(e) {
 }
 
 function onContextMenu(e) {
+	setTimeout(endSharing, 0);
+	if (mouse_status.button !== 2) return;
 	if (dragging) {
 		// 如果刚刚在拖动, 则避免上下文菜单出现
 		e.preventDefault();
@@ -266,9 +324,9 @@ function getSettings() {
 disableSharing();
 getSettings();
 
+de.addEventListener('contextmenu', onContextMenu, false);
 de.addEventListener('mousedown', onMouseDown, false);
 de.addEventListener('mouseup', onMouseUp, false);
-de.addEventListener('contextmenu', onContextMenu, false);
 
 (function() {
 	// 每次重新加载时, 接触事件绑定, 方便测试
@@ -279,9 +337,9 @@ de.addEventListener('contextmenu', onContextMenu, false);
 
 	window.addEventListener(event_type, function onExtReloaded() {
 		window.removeEventListener(event_type, onExtReloaded, false);
+		de.removeEventListener('contextmenu', onContextMenu, false);
 		de.removeEventListener('mousedown', onMouseDown, false);
 		de.removeEventListener('mouseup', onMouseUp, false);
-		de.removeEventListener('contextmenu', onContextMenu, false);
 	}, false);
 })();
 
