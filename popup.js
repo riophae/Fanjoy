@@ -6,6 +6,7 @@ String.prototype.clear = function() {
 var ce = chrome.extension;
 ce.connect({ name: 'popup' });
 (ce.onMessage || ce.onRequest).addListener(onMessage);
+ce.sendMessage = ce.sendMessage || ce.sendRequest;
 
 var bg_win = ce.getBackgroundPage();
 var Ripple = bg_win.Ripple;
@@ -257,6 +258,8 @@ function showInquiry(msg, ok, ng) {
 }
 
 function showError(msg, mode) {
+	Share.playSound();
+	focusOnPopup();
 	$('errorMsg').innerHTML = msg;
 	showOverlay(error);
 	if (mode) {
@@ -559,8 +562,14 @@ function onMessage(req, sender, response) {
 }
 
 function closePopup() {
-	(ce.sendMessage || ce.sendRequest)({
+	ce.sendMessage({
 		type: 'close_this_tab'
+	});
+}
+
+function focusOnPopup() {
+	ce.sendMessage({
+		type: 'focus_on_this_window'
 	});
 }
 

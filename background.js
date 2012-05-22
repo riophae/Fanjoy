@@ -30,6 +30,12 @@ function onMessage(msg, sender, sendResponse) {
 			closeTab(tab.id);
 			break;
 
+		case 'focus_on_this_window':
+			chrome.windows.update(tab.windowId, {
+				focused: true
+			});
+			break;
+
 		case 'get_settings':
 			var code = getSerilizedSettings();
 			if (tab.url.indexOf(ce.getURL('')) == 0) {
@@ -397,6 +403,11 @@ var Share = this.Share = {
 			selected: true
 		});
 	},
+	playSound: (function() {
+		var beep = new Audio;
+		beep.src = 'beep.mp3';
+		return beep.play.bind(beep);
+	})(),
 	account: lscache.get('account_details'), // 当前账号的数据, 如昵称头像等
 	accessToken: lscache.get('access_token'), // 缓存的 access token, 与饭否服务器联络的凭证
 	user: null // 一个 Ripple 实例, 提供所有 API 接口
