@@ -398,10 +398,10 @@ var settings = {
 		templates: {
 			'selection': '$page_tit $page_url $sel',
 			'link': '$link_tit|$link_desc $link_url $sel',
-			'image': '#$img_desc|$page_tit#'
+			'image': '#$img_tit|$img_desc|$page_tit#'
 		}
 	},
-	keys: ['page_tit', 'page_url', 'sel', 'img_desc', 'img_url', 'link_url', 'link_desc', 'link_tit'],
+	keys: ['page_tit', 'page_url', 'sel', 'img_desc', 'img_tit', 'img_url', 'link_url', 'link_desc', 'link_tit'],
 	current: {}
 };
 

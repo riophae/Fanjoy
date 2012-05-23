@@ -102,6 +102,7 @@ function shareImage(url) {
 	port.postMessage('post_details', {
 		type: 'image',
 		img_desc: source.alt,
+		img_tit: source.title,
 		img_url: src
 	});
 
