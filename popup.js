@@ -481,9 +481,11 @@ function applyTemplate() {
 	template = template.replace(/(?:\$([a-z_]+)\|)+\$([a-z_]+)/g, function() {
 		var found_keys = [].slice.call(arguments, 1);
 		var result;
+		var key;
 		for (var i = 0; i < found_keys.length; i++) {
-			if (data[found_keys[i]]) {
-				result = '$' + found_keys[i];
+			key = found_keys[i];
+			if (keys.indexOf(key) > -1 && data[key]) {
+				result = '$' + key;
 				break;
 			}
 		}
