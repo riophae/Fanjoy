@@ -50,11 +50,17 @@ function onMessage(msg, sender, sendResponse) {
 
 function onConnect(page_port) {
 	var tab_id;
+	var max_pos = {
+		x: window.screen.width - Share.defaultStyle.winWidth,
+		y: window.screen.height - Share.defaultStyle.winHeight
+	};
 	page_port.onMessage.addListener(function(msg) {
 		switch (msg.type) {
 			// 创建一个分享页面
-			var pos = msg.pos || { x: 200, y: 200 };
 			case 'create_popup':
+				var pos = msg.pos || { x: 200, y: 200 };
+				pos.x = Math.min(max_pos.x, pos.x);
+				pos.y = Math.min(max_pos.y, pos.y);
 				var options = {
 					url: 'popup.html',
 					width: Share.defaultStyle.winWidth,
