@@ -50,34 +50,16 @@ function onMessage(msg, sender, sendResponse) {
 
 function onConnect(page_port) {
 	var tab_id;
-	var max_pos = {
-		x: window.screen.width - Share.defaultStyle.winWidth,
-		y: window.screen.height - Share.defaultStyle.winHeight
-	};
 	page_port.onMessage.addListener(function(msg) {
 		switch (msg.type) {
 			// 创建一个分享页面
 			case 'create_popup':
-				var pos = msg.pos || { x: 200, y: 200 };
-				pos.x = Math.min(max_pos.x, pos.x);
-				pos.y = Math.min(max_pos.y, pos.y);
-				var options = {
-					url: 'popup.html',
-					width: Share.defaultStyle.winWidth,
-					height: Share.defaultStyle.winHeight,
-					focused: true,
-					type: 'panel',
-					left: pos.x,
-					top: pos.y
-				};
-				chrome.windows.create(options, function(win) {
+				createPopup(msg.pos, function(win) {
 					tab_id = win.tabs[0].id;
-					ce.onConnect.addListener(function onPopupConnected(popup_port) {
-						if (! popup_port.sender || popup_port.sender.tab.id !== tab_id) return;
+					onPopupConnected(tab_id, function() {
 						page_port.postMessage({
 							type: 'popup_created'
 						});
-						ce.onConnect.removeListener(onPopupConnected);
 					});
 				});
 				break;
@@ -86,6 +68,34 @@ function onConnect(page_port) {
 				ct.sendMessage(tab_id, msg);
 				break;
 		}
+	});
+}
+
+function createPopup(pos, callback) {
+	var max_pos = {
+		x: window.screen.width - Share.defaultStyle.winWidth,
+		y: window.screen.height - Share.defaultStyle.winHeight
+	};
+	pos = pos || { x: 200, y: 200 };
+	pos.x = Math.min(max_pos.x, pos.x);
+	pos.y = Math.min(max_pos.y, pos.y);
+	var options = {
+		url: 'popup.html',
+		width: Share.defaultStyle.winWidth,
+		height: Share.defaultStyle.winHeight,
+		focused: true,
+		type: 'panel',
+		left: pos.x,
+		top: pos.y
+	};
+	chrome.windows.create(options, callback);
+}
+
+function onPopupConnected(tab_id, callback) {
+	ce.onConnect.addListener(function(port) {
+		if (! port.sender || port.sender.tab.id !== tab_id) return;
+		callback();
+		ce.onConnect.removeListener(arguments.callee);
 	});
 }
 
@@ -121,12 +131,36 @@ function setupContextMenus() {
 			title: onContextmenus[type][0],
 			onclick: function(info, tab) {
 				var code = onContextmenus[type][1].call(this, info, tab);
-				if (tab.url.indexOf(root_url) == 0) {
-					if (tab.url != root_url + 'introduction.html') return;
-					ct.sendMessage(tab.id, {
-						type: 'do',
-						code: code
-					});
+				var url = tab.url;
+				if (url.indexOf('http://') != 0 && url.indexOf('https://') != 0) {
+					if (url.indexOf(root_url) == 0) {
+						if (url != root_url + 'introduction.html') return;
+						ct.sendMessage(tab.id, {
+							type: 'do',
+							code: code
+						});
+					} else {
+						createPopup({
+							x: 200,
+							y: 200
+						}, function(win) {
+							var tab_id = win.tabs[0].id;
+							onPopupConnected(tab_id, function() {
+								console.log(tab_id);
+								ct.sendMessage(tab_id, {
+									type: 'post_details',
+									msg: {
+										type: type == 'page' ? 'selection' : type,
+										fromBG: true,
+										link_url: info.linkUrl,
+										img_url: info.srcUrl,
+										page_url: info.frameUrl || info.pageUrl,
+										sel: info.selectionText
+									}
+								});
+							});
+						});
+					}
 				} else {
 					ct.executeScript(tab.id, {
 						code: code
