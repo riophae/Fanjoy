@@ -146,7 +146,6 @@ function setupContextMenus() {
 						}, function(win) {
 							var tab_id = win.tabs[0].id;
 							onPopupConnected(tab_id, function() {
-								console.log(tab_id);
 								ct.sendMessage(tab_id, {
 									type: 'post_details',
 									msg: {
