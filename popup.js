@@ -210,6 +210,8 @@ function adjustSize(e) {
 
 function adjustSizeForPic() {
 	function callback() {
+		pic.parentElement.classList.add('imgLoaded');
+		
 		// 调整输入框尺寸
 		var pic_height = pic.parentElement.offsetHeight;
 		min_height = Math.max(pic_height, min_height);
