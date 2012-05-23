@@ -337,7 +337,7 @@ function submit() {
 			e.exceptionType +
 			' / 请检查网络连接.';
 		showError(error);
-		console.log(e)
+		console.log(e);
 		enableButton();
 	}).
 	hold(function() {
@@ -445,19 +445,28 @@ function processData() {
 function processImage() {
 	show.style.display = 'block';
 	var img_url = data.img_url;
-
+	
 	if (Ripple.helpers.isString(img_url) &&
 		img_url.indexOf('data:image/') === 0) {
 		pic.src = img_url;
-		adjustSizeForPic();
 		Ripple.helpers.buildPhotoBlob(img_url).
 		next(function(blob) {
 			data.img_data = blob;
+			adjustSizeForPic();
 			enableButton();
 		});
 	} else {
 		if (Ripple.helpers.type(img_url) != 'object') {
 			disableButton('Loading..', '加载');
+		}
+		if (data.fromBG) {
+			pic.src = img_url;
+			Ripple.helpers.buildPhotoBlob(img_url).
+			next(function(blob) {
+				data.img_data = blob;
+				adjustSizeForPic();
+				enableButton();
+			});
 		}
 	}
 }
@@ -484,7 +493,7 @@ function applyTemplate() {
 		var key;
 		for (var i = 0; i < found_keys.length; i++) {
 			key = found_keys[i];
-			if (keys.indexOf(key) > -1 && data[key]) {
+			if (keys.indexOf(key) > -1) {
 				result = '$' + key;
 				break;
 			}
@@ -494,11 +503,11 @@ function applyTemplate() {
 
 	var selected_text = '';
 	var result = template.replace(/#?\$([a-z_]+)#?/g, function(str, key) {
-		var result = data[key] || '';
-		if (str[0] == '#' && str[str.length-1] == '#') {
+		var result = data[key];
+		if (str[0] == '#' && str[str.length-1] == '#' && result) {
 			selected_text = result;
 		}
-		return result;
+		return result || '';
 	});
 
 	setContent(result);
