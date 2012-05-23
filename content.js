@@ -226,6 +226,7 @@ function shareLink(link) {
 }
 
 function onMouseDown(e) {
+	if (e.button === 0) return;
 	if (dragging) {
 		if (mouse_status.type !== 'mousedown') {
 			endSharing();
@@ -263,7 +264,7 @@ function onMouseDown(e) {
 }
 
 function onMouseUp(e) {
-	if (e.button !==0) setTimeout(endSharing, 0);
+	if (e.button !== 0) setTimeout(endSharing, 0);
 	setStatus(e);
 	if (settings.ctrlKey !== e.ctrlKey) return;
 	if (settings.enableMidButton) {
