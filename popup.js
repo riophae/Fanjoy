@@ -570,6 +570,7 @@ function closePopup() {
 }
 
 function focusOnPopup() {
+	if ((document.webkitVisibilityState || document.visibilityState) === 'visible') return;
 	ce.sendMessage({
 		type: 'focus_on_this_window'
 	});
