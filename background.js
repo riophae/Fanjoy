@@ -54,24 +54,12 @@ function onConnect(page_port) {
 		switch (msg.type) {
 			// 创建一个分享页面
 			case 'create_popup':
-				var pos = msg.pos || { x: 200, y: 200 };
-				var options = {
-					url: 'popup.html',
-					width: Share.defaultStyle.winWidth,
-					height: Share.defaultStyle.winHeight,
-					focused: true,
-					type: 'panel',
-					left: pos.x,
-					top: pos.y
-				};
-				chrome.windows.create(options, function(win) {
+				createPopup(msg.pos, function(win) {
 					tab_id = win.tabs[0].id;
-					ce.onConnect.addListener(function onPopupConnected(popup_port) {
-						if (! popup_port.sender || popup_port.sender.tab.id !== tab_id) return;
+					onPopupConnected(tab_id, function() {
 						page_port.postMessage({
 							type: 'popup_created'
 						});
-						ce.onConnect.removeListener(onPopupConnected);
 					});
 				});
 				break;
@@ -80,6 +68,41 @@ function onConnect(page_port) {
 				ct.sendMessage(tab_id, msg);
 				break;
 		}
+	});
+}
+
+function createPopup(pos, callback) {
+	var max_pos = {
+		x: window.screen.width - Fanjoy.defaultStyle.winWidth,
+		y: window.screen.height - Fanjoy.defaultStyle.winHeight
+	};
+	pos = pos || { x: 200, y: 200 };
+	pos.x = Math.min(max_pos.x, pos.x);
+	pos.y = Math.min(max_pos.y, pos.y);
+	var options = {
+		url: 'popup.html',
+		width: Fanjoy.defaultStyle.winWidth,
+		height: Fanjoy.defaultStyle.winHeight,
+		focused: true,
+		type: 'panel',
+		left: pos.x,
+		top: pos.y
+	};
+	chrome.windows.create(options, callback);
+}
+
+function onPopupConnected(tab_id, callback) {
+	ce.onConnect.addListener(function(port) {
+		if (! port.sender || port.sender.tab.id !== tab_id) return;
+		callback();
+		ce.onConnect.removeListener(arguments.callee);
+	});
+}
+
+function createTab(url) {
+	ct.create({
+		url: url,
+		selected: true
 	});
 }
 
@@ -92,10 +115,10 @@ function applySettings() {
 }
 
 function updateDetails(mode) {
-	var user = Ripple(Share.accessToken);
+	var user = Ripple(Fanjoy.accessToken);
 	var verify = user.verify().next(function(details) {
 		lscache.set('account_details', details);
-		Share.account = details;
+		Fanjoy.account = details;
 	});
 	if (mode) {
 		// 延时重试
@@ -115,12 +138,35 @@ function setupContextMenus() {
 			title: onContextmenus[type][0],
 			onclick: function(info, tab) {
 				var code = onContextmenus[type][1].call(this, info, tab);
-				if (tab.url.indexOf(root_url) == 0) {
-					if (tab.url != root_url + 'introduction.html') return;
-					ct.sendMessage(tab.id, {
-						type: 'do',
-						code: code
-					});
+				var url = tab.url;
+				if (url.indexOf('http://') != 0 && url.indexOf('https://') != 0) {
+					if (url.indexOf(root_url) == 0) {
+						if (url != root_url + 'introduction.html') return;
+						ct.sendMessage(tab.id, {
+							type: 'do',
+							code: code
+						});
+					} else {
+						createPopup({
+							x: 200,
+							y: 200
+						}, function(win) {
+							var tab_id = win.tabs[0].id;
+							onPopupConnected(tab_id, function() {
+								ct.sendMessage(tab_id, {
+									type: 'post_details',
+									msg: {
+										type: type == 'page' ? 'selection' : type,
+										fromBG: true,
+										link_url: info.linkUrl,
+										img_url: info.srcUrl,
+										page_url: info.frameUrl || info.pageUrl,
+										sel: info.selectionText
+									}
+								});
+							});
+						});
+					}
 				} else {
 					ct.executeScript(tab.id, {
 						code: code
@@ -168,9 +214,9 @@ function broadcast(callback) {
 }
 
 function load() {
-	if (Share.loaded) return;
-	Share.loaded = true;
-	Share.user = Ripple(Share.accessToken);
+	if (Fanjoy.loaded) return;
+	Fanjoy.loaded = true;
+	Fanjoy.user = Ripple(Fanjoy.accessToken);
 	ce.onConnect.addListener(onConnect);
 	ce.onMessage.addListener(onMessage);
 	setupContextMenus();
@@ -178,9 +224,9 @@ function load() {
 }
 
 function unload() {
-	if (! Share.loaded) return;
-	Share.loaded = false;
-	Share.user = null;
+	if (! Fanjoy.loaded) return;
+	Fanjoy.loaded = false;
+	Fanjoy.user = null;
 	ce.onConnect.removeListener(onConnect);
 	ce.onMessage.removeListener(onMessage);
 	chrome.contextMenus.removeAll();
@@ -189,7 +235,7 @@ function unload() {
 
 function initialize() {
 
-	if (Share.accessToken) {
+	if (Fanjoy.accessToken) {
 		// 更新账户信息
 		updateDetails().
 		next(function() {
@@ -202,7 +248,7 @@ function initialize() {
 				reset();
 			} else {
 				// 网络错误
-				if (Share.account) {
+				if (Fanjoy.account) {
 					// 如果本地存在缓存的账户信息,
 					// 则先使用缓存, 等一会再重试
 					load();
@@ -272,7 +318,7 @@ function initialize() {
 
 		// 把 access token 缓存下来并重启程序
 		lscache.set('access_token', token);
-		Share.accessToken = token;
+		Fanjoy.accessToken = token;
 		initialize();
 
 		// 首次运行且完成验证后, 打开入门教程
@@ -308,8 +354,8 @@ function initialize() {
 
 // 清理所有与当前用户有关的数据, 恢复到未加载状态
 function reset() {
-	Share.unload();
-	Share.accessToken = Share.account = Share.user = null;
+	Fanjoy.unload();
+	Fanjoy.accessToken = Fanjoy.account = Fanjoy.user = null;
 	lscache.remove('access_token');
 	lscache.remove('account_details');
 	initialize();
@@ -358,14 +404,27 @@ var settings = {
 		templates: {
 			'selection': '$page_tit $page_url $sel',
 			'link': '$link_tit|$link_desc $link_url $sel',
-			'image': '#$img_desc|$page_tit#'
+			'image': '#$img_tit|$img_desc|$page_tit#'
 		}
 	},
-	keys: ['page_tit', 'page_url', 'sel', 'img_desc', 'img_url', 'link_url', 'link_desc', 'link_tit'],
+	keys: ['page_tit', 'page_url', 'sel', 'img_desc', 'img_tit', 'img_url', 'link_url', 'link_desc', 'link_tit'],
 	current: {}
 };
 
-var Share = this.Share = {
+(function() {
+	var is_mac_os = navigator.platform.indexOf('Mac') > -1;
+	if (is_mac_os) {
+		settings.default.enableGesture = false;
+	}
+});
+
+var Fanjoy = this.Fanjoy = {
+	version: (function() {
+		var xhr = new XMLHttpRequest;
+		xhr.open('GET', 'manifest.json', false);
+		xhr.send(null);
+		return JSON.parse(xhr.responseText).version;
+	})(),
 	defaultStyle: {
 		winWidth: 300,
 		winHeight: 163,
@@ -390,11 +449,18 @@ var Share = this.Share = {
 		lscache.set('settings', settings.current);
 		applySettings();
 	},
+	getSuccessCount: function() {
+		return lscache.get('success_count') || 0;
+	},
+	setSuccessCount: function() {
+		var count = Fanjoy.getSuccessCount();
+		lscache.set('success_count', ++count);
+	},
 	showLogin: function() {
-		ct.create({
-			url: 'http://fanfou.com/login',
-			selected: true
-		});
+		createTab('http://fanfou.com/login');
+	},
+	showExtHomePage: function() {
+		createTab('https://chrome.google.com/webstore/detail/fkabhbjhcdoccohpojphgofmlljekcgg/reviews');
 	},
 	playSound: (function() {
 		var beep = new Audio;
@@ -406,7 +472,7 @@ var Share = this.Share = {
 	user: null // 一个 Ripple 实例, 提供所有 API 接口
 };
 
-settings.current = Share.getSettings();
+settings.current = Fanjoy.getSettings();
 
 initialize();
 initializeContentScripts();

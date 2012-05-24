@@ -12,7 +12,7 @@ var bg_win = ce.getBackgroundPage();
 var Ripple = bg_win.Ripple;
 var Deferred = bg_win.Deferred;
 var lscache = bg_win.lscache;
-var Share = bg_win.Share;
+var Fanjoy = bg_win.Fanjoy;
 
 var bd_style = {};
 bd_style = document.defaultView.getComputedStyle(document.body, null);
@@ -25,7 +25,7 @@ var log = console.log.bind(console);
 var de = document.documentElement;
 var html_style = document.defaultView.getComputedStyle(de, null);
 
-var min_height = Share.defaultStyle.minContentHeight;
+var min_height = Fanjoy.defaultStyle.minContentHeight;
 
 var resizing = false;
 var delta = 0;
@@ -36,7 +36,7 @@ var http_s_url = "https?://(((((([0-9a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([0
 var ftp_url = "ftp://(((((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|;|\\?|&|=)*)(:(((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|;|\\?|&|=)*)){0,1}@){0,1}(((((([0-9a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([0-9a-zA-Z]))\\.)*(([a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([a-zA-Z])))|([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+))(:([0-9]+)){0,1}))(/((((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|\\?|:|@|&|=)*)(/(((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|\\?|:|@|&|=)*))*)(;type=(A|I|D|a|i|d))?)?";
 var url_patt = '(' + http_s_url + ')|(' + ftp_url + ')';
 var url_re = new RegExp(url_patt, 'g');
-var url_max_len = 25;
+var url_max_len = 35;
 var url_placeholder = 'http://is.gd/xxxxxx';
 
 function forEach(arr, func, context) {
@@ -85,7 +85,7 @@ template_code.onchange = template_code.onkeydown = throttle(function(e) {
 	if (! this.value.length) this.value = this.default;
 	var settings = { templates: {} };
 	settings.templates[template_type.value] = template_code.value;
-	Share.setSettings(settings);
+	Fanjoy.setSettings(settings);
 }, 40);
 
 available_keys.onchange = function(e) {
@@ -96,7 +96,7 @@ available_keys.onchange = function(e) {
 }
 
 inner.style.minHeight = min_height + 'px';
-inner.style.maxHeight = Share.defaultStyle.maxContentHeight + 'px';
+inner.style.maxHeight = Fanjoy.defaultStyle.maxContentHeight + 'px';
 
 progress_bar.style.width = full_width;
 
@@ -135,8 +135,8 @@ forEach(hide_btns, function(hide_btn) {
 });
 logout_btn.addEventListener('click', switchAccount, false);
 
-$('userName').textContent = Share.account.screen_name;
-$('avatar').src = Share.account.profile_image_url;
+$('userName').textContent = Fanjoy.account.screen_name;
+$('avatar').src = Fanjoy.account.profile_image_url;
 
 var enable_mouse_action = $('enableMouseAction');
 var mouse_action = $('mouseAction');
@@ -145,7 +145,7 @@ var acting = false;
 show_options.addEventListener('click', function(e) {
 	acting = true;
 
-	var settings = Share.getSettings();
+	var settings = Fanjoy.getSettings();
 	template_type.onchange.call(template_type);
 
 	enable_mouse_action.checked = settings.enableGesture || settings.enableMidButton;
@@ -157,7 +157,7 @@ show_options.addEventListener('click', function(e) {
 options.onchange = function(e) {
 	if (acting) return;
 	var enable = enable_mouse_action.checked;
-	Share.setSettings({
+	Fanjoy.setSettings({
 		enableGesture: enable && mouse_action.value == 'rightButtonDrag',
 		enableMidButton: enable && mouse_action.value == 'clickMiddleButton',
 		ctrlKey: ctrl_key.checked
@@ -179,14 +179,14 @@ function throttle(func, delay) {
 
 function cacheSize(callback) {
 	document.body.className = 'default';
-	delta = Share.defaultStyle.winHeight - parseInt(bd_style.height);
+	delta = Fanjoy.defaultStyle.winHeight - parseInt(bd_style.height);
 	document.body.removeAttribute('class');
 }
 
 var onAdjustSize = throttle(function() {
 	var _delta = de.offsetHeight - de.clientHeight;
 	if (_delta) {
-		Share.defaultStyle.winHeight += _delta;
+		Fanjoy.defaultStyle.winHeight += _delta;
 		cacheSize();
 		adjustSize();
 	}
@@ -202,7 +202,7 @@ function adjustSize(e) {
 	if (wrapper.offsetHeight != wrapper.clientHeight) {
 		cacheSize();
 	} else {
-		w.resizeTo(Share.defaultStyle.winWidth, delta + parseInt(bd_style.height));
+		w.resizeTo(Fanjoy.defaultStyle.winWidth, delta + parseInt(bd_style.height));
     onAdjustSize();
 	}
 	onSizeAdjusted();
@@ -210,27 +210,18 @@ function adjustSize(e) {
 
 function adjustSizeForPic() {
 	function callback() {
+		pic.parentElement.classList.add('imgLoaded');
+
 		// 调整输入框尺寸
 		var pic_height = pic.parentElement.offsetHeight;
 		min_height = Math.max(pic_height, min_height);
 		inner.style.minHeight = min_height + 'px';
 		adjustSize();
 
-		// 给图片添加图片尺寸/文件大小信息
-		var h = pic.naturalHeight;
-		var w = pic.naturalWidth;
-		if (h && w) {
-			pic.parentElement.title = w + '×' + h;
-			var size = data.img_data.size;
-			if (size) {
-				var units = ['', 'K', 'M', 'G', 'T'];
-				while (size / 1024 >= .75) {
-					size = size / 1024;
-					units.shift();
-				}
-				size = Math.round(size * 10) / 10 + units[0] + 'B';
-				pic.parentElement.title += '@' + size;
-			}
+		if (data.img_data.type === 'image/png') {
+			fixTransparentPNG();
+		} else {
+			setPicTitle();
 		}
 	}
 	// 等待图片加载完毕
@@ -258,7 +249,7 @@ function showInquiry(msg, ok, ng) {
 }
 
 function showError(msg, mode) {
-	Share.playSound();
+	Fanjoy.playSound();
 	focusOnPopup();
 	$('errorMsg').innerHTML = msg;
 	showOverlay(error);
@@ -310,6 +301,51 @@ function collaposeSelec() {
 	select(length, length);
 }
 
+function setPicTitle() {
+	// 给图片添加图片尺寸/文件大小信息
+	var h = pic.naturalHeight;
+	var w = pic.naturalWidth;
+	if (h && w) {
+		pic.parentElement.title = w + '×' + h;
+		var size = data.img_data.size;
+		if (size) {
+			var units = ['', 'K', 'M', 'G', 'T'];
+			while (size / 1024 >= .75) {
+				size = size / 1024;
+				units.shift();
+			}
+			size = Math.round(size * 10) / 10 + units[0] + 'B';
+			pic.parentElement.title += '@' + size;
+		}
+	}
+}
+
+function fixTransparentPNG() {
+	Ripple.helpers.image2canvas(pic).
+	next(function(canvas) {
+		var ctx = canvas.getContext('2d');
+		var image_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		var pixel_array = image_data.data;
+		var m, a, s;
+		for (var i = 0, len = pixel_array.length; i < len; i += 4) {
+			a = pixel_array[i+3];
+			if (a === 255) continue;
+			s = 255 - a;
+			a /= 255;
+			m = 3;
+			while (m--) {
+				pixel_array[i+m] = pixel_array[i+m] * a + s;
+			}
+			pixel_array[i+3] = 255;
+		}
+		ctx.putImageData(image_data, 0, 0);
+		canvas.toBlob(function(blob) {
+			data.img_data = blob;
+			setPicTitle();
+		});
+	});
+}
+
 function submit() {
   if (button.disabled) return;
 
@@ -320,6 +356,8 @@ function submit() {
 
 	shorten().
 	next(post).
+	next(Fanjoy.setSuccessCount).
+	next(checkSuccessCount).
 	next(closePopup).
 	error(function(e) {
 		var error = e.status ?
@@ -335,7 +373,7 @@ function submit() {
 			e.exceptionType +
 			' / 请检查网络连接.';
 		showError(error);
-		console.log(e)
+		console.log(e);
 		enableButton();
 	}).
 	hold(function() {
@@ -424,7 +462,7 @@ function post() {
 		}
 	};
 
-	return Share.user[img_data ? 'postPhoto' : 'postStatus'](params).setupAjax(ajax_options);
+	return Fanjoy.user[img_data ? 'postPhoto' : 'postStatus'](params).setupAjax(ajax_options);
 }
 
 function processData() {
@@ -447,21 +485,30 @@ function processImage() {
 	if (Ripple.helpers.isString(img_url) &&
 		img_url.indexOf('data:image/') === 0) {
 		pic.src = img_url;
-		adjustSizeForPic();
 		Ripple.helpers.buildPhotoBlob(img_url).
 		next(function(blob) {
 			data.img_data = blob;
+			adjustSizeForPic();
 			enableButton();
 		});
 	} else {
 		if (Ripple.helpers.type(img_url) != 'object') {
 			disableButton('Loading..', '加载');
 		}
+		if (data.fromBG) {
+			pic.src = img_url;
+			Ripple.helpers.buildPhotoBlob(img_url).
+			next(function(blob) {
+				data.img_data = blob;
+				adjustSizeForPic();
+				enableButton();
+			});
+		}
 	}
 }
 
 function getTemplates() {
-	return Share.getSettings().templates;
+	return Fanjoy.getSettings().templates;
 }
 
 function applyTemplate() {
@@ -479,9 +526,11 @@ function applyTemplate() {
 	template = template.replace(/(?:\$([a-z_]+)\|)+\$([a-z_]+)/g, function() {
 		var found_keys = [].slice.call(arguments, 1);
 		var result;
+		var key;
 		for (var i = 0; i < found_keys.length; i++) {
-			if (data[found_keys[i]]) {
-				result = '$' + found_keys[i];
+			key = found_keys[i];
+			if (keys.indexOf(key) > -1) {
+				result = '$' + key;
 				break;
 			}
 		}
@@ -490,11 +539,11 @@ function applyTemplate() {
 
 	var selected_text = '';
 	var result = template.replace(/#?\$([a-z_]+)#?/g, function(str, key) {
-		var result = data[key] || '';
-		if (str[0] == '#' && str[str.length-1] == '#') {
+		var result = data[key];
+		if (str[0] == '#' && str[str.length-1] == '#' && result) {
 			selected_text = result;
 		}
-		return result;
+		return result || '';
 	});
 
 	setContent(result);
@@ -568,9 +617,24 @@ function closePopup() {
 }
 
 function focusOnPopup() {
+	if ((document.webkitVisibilityState || document.visibilityState) === 'visible') return;
 	ce.sendMessage({
 		type: 'focus_on_this_window'
 	});
+}
+
+function checkSuccessCount() {
+	var count = Fanjoy.getSuccessCount();
+	if (count === 5) {
+		var d = new Deferred;
+		var msg = '您已经成功分享了 5 次! 如果喜欢这个扩展, 请给它打个 5 星!';
+		var agreed = function() {
+			Fanjoy.showExtHomePage();
+			closePopup();
+		}
+		showInquiry(msg, agreed, d.call.bind(d));
+		return d;
+	}
 }
 
 function switchAccount() {
@@ -591,16 +655,16 @@ function switchAccount() {
 			var current_name = html.match(/<title> 饭否 \| 欢迎你，(.+)<\/title>/)[1];
 			code += '<p>';
 			code += '当前登录: <strong>' + current_name + '</strong>, ';
-			code += current_id == Share.account.id ?
-				'已通过验证.' : '已通过验证: ' + '<strong>' + Share.account.screen_name + '</strong>.';
+			code += current_id == Fanjoy.account.id ?
+				'已通过验证.' : '已通过验证: ' + '<strong>' + Fanjoy.account.screen_name + '</strong>.';
 			code += '</p>';
-			if (current_id != Share.account.id) {
+			if (current_id != Fanjoy.account.id) {
 				code += '<p>若不希望切换到<strong>' + current_name + '</strong>, 请先 ';
 			}
 			code += '<button id="logoutFF">登出</button><span class="arrow">&raquo;</span>';
 		}
 		code += '<button id="login">登录</button>';
-		code += (current_id && current_id != Share.account.id) ?
+		code += (current_id && current_id != Fanjoy.account.id) ?
 			'</p>' : '<span class="arrow">&raquo;</span>';
 		code += '<button id="authorize">验证</button>';
 
@@ -627,12 +691,12 @@ function switchAccount() {
 		}
 
 		$('login').onclick = function() {
-			Share.showLogin();
+			Fanjoy.showLogin();
 		}
 
 		$('authorize').onclick = function() {
-			Share.reset();
-			Share.closeAllPopup();
+			Fanjoy.reset();
+			Fanjoy.closeAllPopup();
 		}
 	}).
 	error(function(e) {
@@ -646,7 +710,7 @@ var fixSize = throttle(function() {
 	if (delta < 10 || delta > 35) {
 		cacheSize();
 	} else {
-		w.resizeTo(Share.defaultStyle.winWidth, delta + parseInt(html_style.height));
+		w.resizeTo(Fanjoy.defaultStyle.winWidth, delta + parseInt(html_style.height));
 	}
 	resizing = false;
 }, 32)
@@ -707,3 +771,6 @@ w.addEventListener('paste', function (e) {
 	selection.removeAllRanges();
 	selection.addRange(range);
 }, false);
+
+$('version').textContent = 'ver ' + Fanjoy.version;
+$('successCount').textContent = Fanjoy.getSuccessCount();

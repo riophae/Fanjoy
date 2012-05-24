@@ -117,7 +117,7 @@
 		html, body, div, select, h2, p {
 			margin: 0;
 			padding: 0;
-			font: 12px "Lucida Grande", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			font: 12px "Lucida Grande", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB W3", "WenQuanYi Micro Hei", sans-serif;
 		}
 		html {
 			overflow: hidden;
@@ -138,6 +138,9 @@
 			font-size: 13px;
 			margin: 0 0 3px 0;
 			text-shadow: 0 0 10px rgba(255, 255, 255, .75);
+		}
+		a {
+			cursor: pointer;
 		}
 		::-webkit-scrollbar {
 			width: 6px;
@@ -334,6 +337,7 @@
 		}
 		#inputArea {
 			word-wrap: break-word;
+			overflow: hidden;
 			padding: 0 5px 0 0;
 			color: #888;
 			line-height: 15px;
@@ -352,16 +356,16 @@
 			position: relative;
 			border-radius: 3px;
 			line-height: 100%;
-			margin-left: 5px;
 			overflow: hidden;
 		}
-		#showArea img {
+		#showArea.imgLoaded img {
 			max-width: 100px;
 			max-height: 100px;
 			border-radius: 3px;
 			box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+			background-color: #fff;
 		}
-		#showArea::before {
+		#showArea.imgLoaded::before {
 			z-index: 10;
 			position: absolute;
 			width: 100%;
@@ -405,6 +409,7 @@
 			border: 1px solid #9a9a9a;
 			border: 1px solid #bbb;
 			box-shadow:
+				0 999px 0 rgba(172, 172, 172, 0) inset,
 				0 1px 0 rgba(255, 255, 255, .75) inset,
 				0 1px 0 rgba(0, 0, 0, .09);
 		}
@@ -419,6 +424,7 @@
 			-webkit-user-select: none;
 			white-space: nowrap;
 			display: inline-block;
+			cursor: pointer;
 		}
 		button.disabled {
 			pointer-events: none;
@@ -546,6 +552,7 @@
 				<option value="link_url">链接地址</option>
 				<option value="sel">选中文字</option>
 				<option value="image_url">图片地址</option>
+				<option value="image_tit">图片标题</option>
 				<option value="image_desc">图片描述</option>
 			</select>
 			<input type="text" id="templateCode" />
@@ -566,10 +573,10 @@
 	<div id="about" class="overlay">
 		<h2>About</h2>
 		<a class="hide" title="隐藏"></a>
-		<p><strong>有饭同享</strong> ver 0.1.0</p>
-		<p>@锐风 <a href="http://fanfou.com/ruif" target="_blank">http://fanfou.com/ruif</a></p>
+		<p><strong>有饭同享</strong> <span id="version"></span> by @<a href="http://fanfou.com/ruif" target="_blank">锐风</a></p>
 		<p>在图片或选中的文字上, 按住鼠标右键向右拖拽即可分享至饭否. <a href="introduction.html" target="_blank">入门教程</a></p>
-		<p>基于开源项目 <a href="https://github.com/riophae/Ripple" target="_blank">Ripple</a> 开发.</p>
+		<p>基于开源项目 <a href="https://github.com/riophae/Ripple" target="_blank">Ripple</a> 开发, <a href="https://github.com/riophae/Fanjoy" target="_blank" title="有饭同享开源项目主页 (GitHub)">GitHub 项目主页</a>.</p>
+		<p><br /> 已成功分享 <strong id="successCount">0</strong> 次.</p>
 	</div>
 	<div id="error" class="overlay">
 		<h2>Error</h2>

@@ -142,6 +142,7 @@ function shareImage(url) {
 	port.postMessage('post_details', {
 		type: 'image',
 		img_desc: source.alt,
+		img_tit: source.title,
 		img_url: src
 	});
 
@@ -347,7 +348,7 @@ de.addEventListener('mouseup', onMouseUp, false);
 
 (function() {
 	// 每次重新加载时, 接触事件绑定, 方便测试
-	var event_type = 'Share2FanfouLoaded';
+	var event_type = 'FanjoyLoaded';
 	var event = document.createEvent('MessageEvent');
 	event.initMessageEvent(event_type);
 	window.dispatchEvent(event);
