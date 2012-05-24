@@ -356,6 +356,7 @@ function submit() {
 
 	shorten().
 	next(post).
+	next(Fanjoy.setSuccessCount).
 	next(closePopup).
 	error(function(e) {
 		var error = e.status ?
@@ -757,3 +758,4 @@ w.addEventListener('paste', function (e) {
 }, false);
 
 $('version').textContent = 'ver ' + Fanjoy.version;
+$('successCount').textContent = Fanjoy.getSuccessCount();

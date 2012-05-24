@@ -435,6 +435,13 @@ var Fanjoy = this.Fanjoy = {
 		lscache.set('settings', settings.current);
 		applySettings();
 	},
+	getSuccessCount: function() {
+		return lscache.get('success_count') || 0;
+	},
+	setSuccessCount: function() {
+		var count = Fanjoy.getSuccessCount();
+		lscache.set('success_count', ++count);
+	},
 	showLogin: function() {
 		ct.create({
 			url: 'http://fanfou.com/login',
