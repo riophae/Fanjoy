@@ -56,7 +56,6 @@ function setStatus(event) {
 	last_status = mouse_status;
 	mouse_status = {
 		button: event.button,
-		ctrl: event.ctrlKey,
 		type: event.type,
 		pos: {
 			x: event.screenX,
@@ -227,7 +226,7 @@ function shareLink(link) {
 }
 
 function isMouseActionEnabled() {
-	return settings.enableGesture || setings.enableMidButton;
+	return settings.enableGesture || settings.enableMidButton;
 }
 
 function onMouseDown(e) {
@@ -284,16 +283,17 @@ function onMouseUp(e) {
 		if (e.button !== 1) return;
 	}
 	else if (! dragging || e.button !== 2) return;
+
+	setCursorPos(e);
+	var d = e.screenX - last_status.pos.x;
 	// 拖拽结束, 如果水平拖拽距离小于 75px, 则忽略这次拖拽
-	if (dragging && e.screenX - cursor_pos.x < 75) {
-		source = null;
-		selection = '';
-		dragging = false;
+	if (dragging && d < 75 && (d <= 0 ||
+		(innerWidth + screenX - mouse_status.pos.x)/2 > d)) {
+		endSharing();
 		return;
 	}
 	e.stopPropagation();
 
-	setCursorPos(e);
 	if (! source) return shareSelection();
 	switch (source.tagName.toLowerCase()) {
 
