@@ -225,8 +225,15 @@ function shareLink(link) {
 	});
 }
 
+function isMouseActionEnabled() {
+	return settings.enableGesture || setings.enableMidButton;
+}
+
 function onMouseDown(e) {
-	if (e.metaKey) return;
+	if (! isMouseActionEnabled() || e.metaKey) {
+		dragging = false;
+		return;
+	}
 	if (e.button === 0) return;
 	if (dragging) {
 		if (mouse_status.type !== 'mousedown') {
@@ -265,7 +272,10 @@ function onMouseDown(e) {
 }
 
 function onMouseUp(e) {
-	if (e.metaKey) return;
+	if (! isMouseActionEnabled() || e.metaKey) {
+		dragging = false;
+		return;
+	}
 	if (e.button !== 0) setTimeout(endSharing, 0);
 	setStatus(e);
 	if (settings.ctrlKey !== e.ctrlKey) return;
@@ -307,6 +317,10 @@ function onMouseUp(e) {
 }
 
 function onContextMenu(e) {
+	if (! isMouseActionEnabled()) {
+		dragging = false;
+		return;
+	}
 	setTimeout(endSharing, 0);
 	if (! e.metaKey && mouse_status.button !== 2) return;
 	if (dragging) {
