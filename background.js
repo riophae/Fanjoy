@@ -99,6 +99,13 @@ function onPopupConnected(tab_id, callback) {
 	});
 }
 
+function createTab(url) {
+	ct.create({
+		url: url,
+		selected: true
+	});
+}
+
 function disableAll() {
 	executeScript('disableSharing();');
 }
@@ -443,10 +450,10 @@ var Fanjoy = this.Fanjoy = {
 		lscache.set('success_count', ++count);
 	},
 	showLogin: function() {
-		ct.create({
-			url: 'http://fanfou.com/login',
-			selected: true
-		});
+		createTab('http://fanfou.com/login');
+	},
+	showExtHomePage: function() {
+		createTab('https://chrome.google.com/webstore/detail/fkabhbjhcdoccohpojphgofmlljekcgg/reviews');
 	},
 	playSound: (function() {
 		var beep = new Audio;

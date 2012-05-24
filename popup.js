@@ -357,6 +357,7 @@ function submit() {
 	shorten().
 	next(post).
 	next(Fanjoy.setSuccessCount).
+	next(checkSuccessCount).
 	next(closePopup).
 	error(function(e) {
 		var error = e.status ?
@@ -620,6 +621,20 @@ function focusOnPopup() {
 	ce.sendMessage({
 		type: 'focus_on_this_window'
 	});
+}
+
+function checkSuccessCount() {
+	var count = Fanjoy.getSuccessCount();
+	if (count === 5) {
+		var d = new Deferred;
+		var msg = '您已经成功分享了 5 次! 如果喜欢这个扩展, 请给它打个 5 星!';
+		var agreed = function() {
+			Fanjoy.showExtHomePage();
+			closePopup();
+		}
+		showInquiry(msg, agreed, d.call.bind(d));
+		return d;
+	}
 }
 
 function switchAccount() {
