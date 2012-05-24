@@ -117,7 +117,7 @@
 		html, body, div, select, h2, p {
 			margin: 0;
 			padding: 0;
-			font: 12px "Lucida Grande", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB W3", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+			font: 12px "Lucida Grande", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB W3", "WenQuanYi Micro Hei", sans-serif;
 		}
 		html {
 			overflow: hidden;
@@ -138,6 +138,9 @@
 			font-size: 13px;
 			margin: 0 0 3px 0;
 			text-shadow: 0 0 10px rgba(255, 255, 255, .75);
+		}
+		a {
+			cursor: pointer;
 		}
 		::-webkit-scrollbar {
 			width: 6px;
@@ -421,6 +424,7 @@
 			-webkit-user-select: none;
 			white-space: nowrap;
 			display: inline-block;
+			cursor: pointer;
 		}
 		button.disabled {
 			pointer-events: none;
@@ -571,7 +575,7 @@
 		<a class="hide" title="隐藏"></a>
 		<p><strong>有饭同享</strong> <span id="version"></span> by @<a href="http://fanfou.com/ruif" target="_blank">锐风</a></p>
 		<p>在图片或选中的文字上, 按住鼠标右键向右拖拽即可分享至饭否. <a href="introduction.html" target="_blank">入门教程</a></p>
-		<p>基于开源项目 <a href="https://github.com/riophae/Ripple" target="_blank">Ripple</a> 开发.</p>
+		<p>基于开源项目 <a href="https://github.com/riophae/Ripple" target="_blank">Ripple</a> 开发, <a href="https://github.com/riophae/Fanjoy" target="_blank" title="有饭同享开源项目主页 (GitHub)">GitHub 项目主页</a>.</p>
 		<p><br /> 已成功分享 <strong id="successCount">0</strong> 次.</p>
 	</div>
 	<div id="error" class="overlay">
