@@ -196,7 +196,7 @@
 
 	var bg_win = chrome.extension.getBackgroundPage();
 	var Ripple = bg_win.Ripple;
-	var Share = bg_win.Share;
+	var Fanjoy = bg_win.Fanjoy;
 
 	(function() {
 		var range = document.createRange();
@@ -211,7 +211,7 @@
 	var wrapper = $('wrapper');
 
 	var check_interval = setInterval(function() {
-		if (! Share.user) return;
+		if (! Fanjoy.user) return;
 		clearInterval(check_interval);
 
 		var status = $$('h3 .comment')[0];

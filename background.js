@@ -73,16 +73,16 @@ function onConnect(page_port) {
 
 function createPopup(pos, callback) {
 	var max_pos = {
-		x: window.screen.width - Share.defaultStyle.winWidth,
-		y: window.screen.height - Share.defaultStyle.winHeight
+		x: window.screen.width - Fanjoy.defaultStyle.winWidth,
+		y: window.screen.height - Fanjoy.defaultStyle.winHeight
 	};
 	pos = pos || { x: 200, y: 200 };
 	pos.x = Math.min(max_pos.x, pos.x);
 	pos.y = Math.min(max_pos.y, pos.y);
 	var options = {
 		url: 'popup.html',
-		width: Share.defaultStyle.winWidth,
-		height: Share.defaultStyle.winHeight,
+		width: Fanjoy.defaultStyle.winWidth,
+		height: Fanjoy.defaultStyle.winHeight,
 		focused: true,
 		type: 'panel',
 		left: pos.x,
@@ -108,10 +108,10 @@ function applySettings() {
 }
 
 function updateDetails(mode) {
-	var user = Ripple(Share.accessToken);
+	var user = Ripple(Fanjoy.accessToken);
 	var verify = user.verify().next(function(details) {
 		lscache.set('account_details', details);
-		Share.account = details;
+		Fanjoy.account = details;
 	});
 	if (mode) {
 		// 延时重试
@@ -207,9 +207,9 @@ function broadcast(callback) {
 }
 
 function load() {
-	if (Share.loaded) return;
-	Share.loaded = true;
-	Share.user = Ripple(Share.accessToken);
+	if (Fanjoy.loaded) return;
+	Fanjoy.loaded = true;
+	Fanjoy.user = Ripple(Fanjoy.accessToken);
 	ce.onConnect.addListener(onConnect);
 	ce.onMessage.addListener(onMessage);
 	setupContextMenus();
@@ -217,9 +217,9 @@ function load() {
 }
 
 function unload() {
-	if (! Share.loaded) return;
-	Share.loaded = false;
-	Share.user = null;
+	if (! Fanjoy.loaded) return;
+	Fanjoy.loaded = false;
+	Fanjoy.user = null;
 	ce.onConnect.removeListener(onConnect);
 	ce.onMessage.removeListener(onMessage);
 	chrome.contextMenus.removeAll();
@@ -228,7 +228,7 @@ function unload() {
 
 function initialize() {
 
-	if (Share.accessToken) {
+	if (Fanjoy.accessToken) {
 		// 更新账户信息
 		updateDetails().
 		next(function() {
@@ -241,7 +241,7 @@ function initialize() {
 				reset();
 			} else {
 				// 网络错误
-				if (Share.account) {
+				if (Fanjoy.account) {
 					// 如果本地存在缓存的账户信息,
 					// 则先使用缓存, 等一会再重试
 					load();
@@ -311,7 +311,7 @@ function initialize() {
 
 		// 把 access token 缓存下来并重启程序
 		lscache.set('access_token', token);
-		Share.accessToken = token;
+		Fanjoy.accessToken = token;
 		initialize();
 
 		// 首次运行且完成验证后, 打开入门教程
@@ -347,8 +347,8 @@ function initialize() {
 
 // 清理所有与当前用户有关的数据, 恢复到未加载状态
 function reset() {
-	Share.unload();
-	Share.accessToken = Share.account = Share.user = null;
+	Fanjoy.unload();
+	Fanjoy.accessToken = Fanjoy.account = Fanjoy.user = null;
 	lscache.remove('access_token');
 	lscache.remove('account_details');
 	initialize();
@@ -404,7 +404,7 @@ var settings = {
 	current: {}
 };
 
-var Share = this.Share = {
+var Fanjoy = this.Fanjoy = {
 	version: (function() {
 		var xhr = new XMLHttpRequest;
 		xhr.open('GET', 'manifest.json', false);
@@ -451,7 +451,7 @@ var Share = this.Share = {
 	user: null // 一个 Ripple 实例, 提供所有 API 接口
 };
 
-settings.current = Share.getSettings();
+settings.current = Fanjoy.getSettings();
 
 initialize();
 initializeContentScripts();

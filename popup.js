@@ -12,7 +12,7 @@ var bg_win = ce.getBackgroundPage();
 var Ripple = bg_win.Ripple;
 var Deferred = bg_win.Deferred;
 var lscache = bg_win.lscache;
-var Share = bg_win.Share;
+var Fanjoy = bg_win.Fanjoy;
 
 var bd_style = {};
 bd_style = document.defaultView.getComputedStyle(document.body, null);
@@ -25,7 +25,7 @@ var log = console.log.bind(console);
 var de = document.documentElement;
 var html_style = document.defaultView.getComputedStyle(de, null);
 
-var min_height = Share.defaultStyle.minContentHeight;
+var min_height = Fanjoy.defaultStyle.minContentHeight;
 
 var resizing = false;
 var delta = 0;
@@ -85,7 +85,7 @@ template_code.onchange = template_code.onkeydown = throttle(function(e) {
 	if (! this.value.length) this.value = this.default;
 	var settings = { templates: {} };
 	settings.templates[template_type.value] = template_code.value;
-	Share.setSettings(settings);
+	Fanjoy.setSettings(settings);
 }, 40);
 
 available_keys.onchange = function(e) {
@@ -96,7 +96,7 @@ available_keys.onchange = function(e) {
 }
 
 inner.style.minHeight = min_height + 'px';
-inner.style.maxHeight = Share.defaultStyle.maxContentHeight + 'px';
+inner.style.maxHeight = Fanjoy.defaultStyle.maxContentHeight + 'px';
 
 progress_bar.style.width = full_width;
 
@@ -135,8 +135,8 @@ forEach(hide_btns, function(hide_btn) {
 });
 logout_btn.addEventListener('click', switchAccount, false);
 
-$('userName').textContent = Share.account.screen_name;
-$('avatar').src = Share.account.profile_image_url;
+$('userName').textContent = Fanjoy.account.screen_name;
+$('avatar').src = Fanjoy.account.profile_image_url;
 
 var enable_mouse_action = $('enableMouseAction');
 var mouse_action = $('mouseAction');
@@ -145,7 +145,7 @@ var acting = false;
 show_options.addEventListener('click', function(e) {
 	acting = true;
 
-	var settings = Share.getSettings();
+	var settings = Fanjoy.getSettings();
 	template_type.onchange.call(template_type);
 
 	enable_mouse_action.checked = settings.enableGesture || settings.enableMidButton;
@@ -157,7 +157,7 @@ show_options.addEventListener('click', function(e) {
 options.onchange = function(e) {
 	if (acting) return;
 	var enable = enable_mouse_action.checked;
-	Share.setSettings({
+	Fanjoy.setSettings({
 		enableGesture: enable && mouse_action.value == 'rightButtonDrag',
 		enableMidButton: enable && mouse_action.value == 'clickMiddleButton',
 		ctrlKey: ctrl_key.checked
@@ -179,14 +179,14 @@ function throttle(func, delay) {
 
 function cacheSize(callback) {
 	document.body.className = 'default';
-	delta = Share.defaultStyle.winHeight - parseInt(bd_style.height);
+	delta = Fanjoy.defaultStyle.winHeight - parseInt(bd_style.height);
 	document.body.removeAttribute('class');
 }
 
 var onAdjustSize = throttle(function() {
 	var _delta = de.offsetHeight - de.clientHeight;
 	if (_delta) {
-		Share.defaultStyle.winHeight += _delta;
+		Fanjoy.defaultStyle.winHeight += _delta;
 		cacheSize();
 		adjustSize();
 	}
@@ -202,7 +202,7 @@ function adjustSize(e) {
 	if (wrapper.offsetHeight != wrapper.clientHeight) {
 		cacheSize();
 	} else {
-		w.resizeTo(Share.defaultStyle.winWidth, delta + parseInt(bd_style.height));
+		w.resizeTo(Fanjoy.defaultStyle.winWidth, delta + parseInt(bd_style.height));
     onAdjustSize();
 	}
 	onSizeAdjusted();
@@ -260,7 +260,7 @@ function showInquiry(msg, ok, ng) {
 }
 
 function showError(msg, mode) {
-	Share.playSound();
+	Fanjoy.playSound();
 	focusOnPopup();
 	$('errorMsg').innerHTML = msg;
 	showOverlay(error);
@@ -426,7 +426,7 @@ function post() {
 		}
 	};
 
-	return Share.user[img_data ? 'postPhoto' : 'postStatus'](params).setupAjax(ajax_options);
+	return Fanjoy.user[img_data ? 'postPhoto' : 'postStatus'](params).setupAjax(ajax_options);
 }
 
 function processData() {
@@ -472,7 +472,7 @@ function processImage() {
 }
 
 function getTemplates() {
-	return Share.getSettings().templates;
+	return Fanjoy.getSettings().templates;
 }
 
 function applyTemplate() {
@@ -605,16 +605,16 @@ function switchAccount() {
 			var current_name = html.match(/<title> 饭否 \| 欢迎你，(.+)<\/title>/)[1];
 			code += '<p>';
 			code += '当前登录: <strong>' + current_name + '</strong>, ';
-			code += current_id == Share.account.id ?
-				'已通过验证.' : '已通过验证: ' + '<strong>' + Share.account.screen_name + '</strong>.';
+			code += current_id == Fanjoy.account.id ?
+				'已通过验证.' : '已通过验证: ' + '<strong>' + Fanjoy.account.screen_name + '</strong>.';
 			code += '</p>';
-			if (current_id != Share.account.id) {
+			if (current_id != Fanjoy.account.id) {
 				code += '<p>若不希望切换到<strong>' + current_name + '</strong>, 请先 ';
 			}
 			code += '<button id="logoutFF">登出</button><span class="arrow">&raquo;</span>';
 		}
 		code += '<button id="login">登录</button>';
-		code += (current_id && current_id != Share.account.id) ?
+		code += (current_id && current_id != Fanjoy.account.id) ?
 			'</p>' : '<span class="arrow">&raquo;</span>';
 		code += '<button id="authorize">验证</button>';
 
@@ -641,12 +641,12 @@ function switchAccount() {
 		}
 
 		$('login').onclick = function() {
-			Share.showLogin();
+			Fanjoy.showLogin();
 		}
 
 		$('authorize').onclick = function() {
-			Share.reset();
-			Share.closeAllPopup();
+			Fanjoy.reset();
+			Fanjoy.closeAllPopup();
 		}
 	}).
 	error(function(e) {
@@ -660,7 +660,7 @@ var fixSize = throttle(function() {
 	if (delta < 10 || delta > 35) {
 		cacheSize();
 	} else {
-		w.resizeTo(Share.defaultStyle.winWidth, delta + parseInt(html_style.height));
+		w.resizeTo(Fanjoy.defaultStyle.winWidth, delta + parseInt(html_style.height));
 	}
 	resizing = false;
 }, 32)
@@ -722,4 +722,4 @@ w.addEventListener('paste', function (e) {
 	selection.addRange(range);
 }, false);
 
-$('version').textContent = 'ver ' + Share.version;
+$('version').textContent = 'ver ' + Fanjoy.version;

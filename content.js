@@ -273,7 +273,7 @@ de.addEventListener('contextmenu', onContextMenu, false);
 
 (function() {
 	// 每次重新加载时, 接触事件绑定, 方便测试
-	var event_type = 'Share2FanfouLoaded';
+	var event_type = 'FanjoyLoaded';
 	var event = document.createEvent('MessageEvent');
 	event.initMessageEvent(event_type);
 	window.dispatchEvent(event);
