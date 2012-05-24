@@ -218,21 +218,10 @@ function adjustSizeForPic() {
 		inner.style.minHeight = min_height + 'px';
 		adjustSize();
 
-		// 给图片添加图片尺寸/文件大小信息
-		var h = pic.naturalHeight;
-		var w = pic.naturalWidth;
-		if (h && w) {
-			pic.parentElement.title = w + '×' + h;
-			var size = data.img_data.size;
-			if (size) {
-				var units = ['', 'K', 'M', 'G', 'T'];
-				while (size / 1024 >= .75) {
-					size = size / 1024;
-					units.shift();
-				}
-				size = Math.round(size * 10) / 10 + units[0] + 'B';
-				pic.parentElement.title += '@' + size;
-			}
+		if (data.img_data.type === 'image/png') {
+			fixTransparentPNG();
+		} else {
+			setPicTitle();
 		}
 	}
 	// 等待图片加载完毕
@@ -310,6 +299,51 @@ function select(start, end) {
 function collaposeSelec() {
 	var length = inputarea.textContent.length;
 	select(length, length);
+}
+
+function setPicTitle() {
+	// 给图片添加图片尺寸/文件大小信息
+	var h = pic.naturalHeight;
+	var w = pic.naturalWidth;
+	if (h && w) {
+		pic.parentElement.title = w + '×' + h;
+		var size = data.img_data.size;
+		if (size) {
+			var units = ['', 'K', 'M', 'G', 'T'];
+			while (size / 1024 >= .75) {
+				size = size / 1024;
+				units.shift();
+			}
+			size = Math.round(size * 10) / 10 + units[0] + 'B';
+			pic.parentElement.title += '@' + size;
+		}
+	}
+}
+
+function fixTransparentPNG() {
+	Ripple.helpers.image2canvas(pic).
+	next(function(canvas) {
+		var ctx = canvas.getContext('2d');
+		var image_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		var pixel_array = image_data.data;
+		var m, a, s;
+		for (var i = 0, len = pixel_array.length; i < len; i += 4) {
+			a = pixel_array[i+3];
+			if (a === 255) continue;
+			s = 255 - a;
+			a /= 255;
+			m = 3;
+			while (m--) {
+				pixel_array[i+m] = pixel_array[i+m] * a + s;
+			}
+			pixel_array[i+3] = 255;
+		}
+		ctx.putImageData(image_data, 0, 0);
+		canvas.toBlob(function(blob) {
+			data.img_data = blob;
+			setPicTitle();
+		});
+	});
 }
 
 function submit() {
