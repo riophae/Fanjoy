@@ -117,7 +117,7 @@
 		html, body, div, select, h2, p {
 			margin: 0;
 			padding: 0;
-			font: 12px "Lucida Grande", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			font: 12px "Lucida Grande", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB W3", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 		}
 		html {
 			overflow: hidden;
@@ -334,6 +334,7 @@
 		}
 		#inputArea {
 			word-wrap: break-word;
+			overflow: hidden;
 			padding: 0 5px 0 0;
 			color: #888;
 			line-height: 15px;
@@ -352,16 +353,16 @@
 			position: relative;
 			border-radius: 3px;
 			line-height: 100%;
-			margin-left: 5px;
 			overflow: hidden;
 		}
-		#showArea img {
+		#showArea.imgLoaded img {
 			max-width: 100px;
 			max-height: 100px;
 			border-radius: 3px;
 			box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+			background-color: #fff;
 		}
-		#showArea::before {
+		#showArea.imgLoaded::before {
 			z-index: 10;
 			position: absolute;
 			width: 100%;
@@ -546,6 +547,7 @@
 				<option value="link_url">链接地址</option>
 				<option value="sel">选中文字</option>
 				<option value="image_url">图片地址</option>
+				<option value="image_tit">图片标题</option>
 				<option value="image_desc">图片描述</option>
 			</select>
 			<input type="text" id="templateCode" />
@@ -566,7 +568,7 @@
 	<div id="about" class="overlay">
 		<h2>About</h2>
 		<a class="hide" title="隐藏"></a>
-		<p><strong>有饭同享</strong> ver 0.1.0</p>
+		<p><strong>有饭同享</strong> <span id="version"></span></p>
 		<p>@锐风 <a href="http://fanfou.com/ruif" target="_blank">http://fanfou.com/ruif</a></p>
 		<p>在图片或选中的文字上, 按住鼠标右键向右拖拽即可分享至饭否. <a href="introduction.html" target="_blank">入门教程</a></p>
 		<p>基于开源项目 <a href="https://github.com/riophae/Ripple" target="_blank">Ripple</a> 开发.</p>

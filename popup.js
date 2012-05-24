@@ -36,7 +36,7 @@ var http_s_url = "https?://(((((([0-9a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([0
 var ftp_url = "ftp://(((((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|;|\\?|&|=)*)(:(((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|;|\\?|&|=)*)){0,1}@){0,1}(((((([0-9a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([0-9a-zA-Z]))\\.)*(([a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([a-zA-Z])))|([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+))(:([0-9]+)){0,1}))(/((((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|\\?|:|@|&|=)*)(/(((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|\\?|:|@|&|=)*))*)(;type=(A|I|D|a|i|d))?)?";
 var url_patt = '(' + http_s_url + ')|(' + ftp_url + ')';
 var url_re = new RegExp(url_patt, 'g');
-var url_max_len = 25;
+var url_max_len = 35;
 var url_placeholder = 'http://is.gd/xxxxxx';
 
 function forEach(arr, func, context) {
@@ -210,6 +210,8 @@ function adjustSize(e) {
 
 function adjustSizeForPic() {
 	function callback() {
+		pic.parentElement.classList.add('imgLoaded');
+
 		// 调整输入框尺寸
 		var pic_height = pic.parentElement.offsetHeight;
 		min_height = Math.max(pic_height, min_height);
@@ -335,7 +337,7 @@ function submit() {
 			e.exceptionType +
 			' / 请检查网络连接.';
 		showError(error);
-		console.log(e)
+		console.log(e);
 		enableButton();
 	}).
 	hold(function() {
@@ -447,15 +449,24 @@ function processImage() {
 	if (Ripple.helpers.isString(img_url) &&
 		img_url.indexOf('data:image/') === 0) {
 		pic.src = img_url;
-		adjustSizeForPic();
 		Ripple.helpers.buildPhotoBlob(img_url).
 		next(function(blob) {
 			data.img_data = blob;
+			adjustSizeForPic();
 			enableButton();
 		});
 	} else {
 		if (Ripple.helpers.type(img_url) != 'object') {
 			disableButton('Loading..', '加载');
+		}
+		if (data.fromBG) {
+			pic.src = img_url;
+			Ripple.helpers.buildPhotoBlob(img_url).
+			next(function(blob) {
+				data.img_data = blob;
+				adjustSizeForPic();
+				enableButton();
+			});
 		}
 	}
 }
@@ -479,9 +490,11 @@ function applyTemplate() {
 	template = template.replace(/(?:\$([a-z_]+)\|)+\$([a-z_]+)/g, function() {
 		var found_keys = [].slice.call(arguments, 1);
 		var result;
+		var key;
 		for (var i = 0; i < found_keys.length; i++) {
-			if (data[found_keys[i]]) {
-				result = '$' + found_keys[i];
+			key = found_keys[i];
+			if (keys.indexOf(key) > -1) {
+				result = '$' + key;
 				break;
 			}
 		}
@@ -490,11 +503,11 @@ function applyTemplate() {
 
 	var selected_text = '';
 	var result = template.replace(/#?\$([a-z_]+)#?/g, function(str, key) {
-		var result = data[key] || '';
-		if (str[0] == '#' && str[str.length-1] == '#') {
+		var result = data[key];
+		if (str[0] == '#' && str[str.length-1] == '#' && result) {
 			selected_text = result;
 		}
-		return result;
+		return result || '';
 	});
 
 	setContent(result);
@@ -568,6 +581,7 @@ function closePopup() {
 }
 
 function focusOnPopup() {
+	if ((document.webkitVisibilityState || document.visibilityState) === 'visible') return;
 	ce.sendMessage({
 		type: 'focus_on_this_window'
 	});
@@ -707,3 +721,5 @@ w.addEventListener('paste', function (e) {
 	selection.removeAllRanges();
 	selection.addRange(range);
 }, false);
+
+$('version').textContent = 'ver ' + Share.version;
