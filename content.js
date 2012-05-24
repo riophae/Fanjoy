@@ -226,6 +226,7 @@ function shareLink(link) {
 }
 
 function onMouseDown(e) {
+	if (e.metaKey) return;
 	if (e.button === 0) return;
 	if (dragging) {
 		if (mouse_status.type !== 'mousedown') {
@@ -264,6 +265,7 @@ function onMouseDown(e) {
 }
 
 function onMouseUp(e) {
+	if (e.metaKey) return;
 	if (e.button !== 0) setTimeout(endSharing, 0);
 	setStatus(e);
 	if (settings.ctrlKey !== e.ctrlKey) return;
@@ -306,7 +308,7 @@ function onMouseUp(e) {
 
 function onContextMenu(e) {
 	setTimeout(endSharing, 0);
-	if (mouse_status.button !== 2) return;
+	if (! e.metaKey && mouse_status.button !== 2) return;
 	if (dragging) {
 		// 如果刚刚在拖动, 则避免上下文菜单出现
 		e.preventDefault();
