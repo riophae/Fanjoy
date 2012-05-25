@@ -120,6 +120,10 @@
 			background-repeat: no-repeat;
 			padding-left: 36px;
 		}
+		.mac #mouseDrag {
+			color: rgba(0, 0, 0, .25);
+			text-decoration: line-through;
+		}
 		p {
 			padding: 5px 0;
 			font-size: 14px;
@@ -156,7 +160,7 @@
 				<div class="left">STEP <span>2</span></div>
 				<div class="right">
 					<ul>
-						<li class="icon" style="background-image: url(images/mouse-right.png);">按住鼠标右键向右拖拽</li>
+						<li class="icon" style="background-image: url(images/mouse-right.png);" id="mouseDrag">按住鼠标右键向右拖拽</li>
 						<li class="or"></li>
 						<li class="icon" style="background-image: url(images/menu.png);">按右键, 显示上下文菜单</li>
 					</ul>
@@ -198,6 +202,8 @@
 	var Ripple = bg_win.Ripple;
 	var Fanjoy = bg_win.Fanjoy;
 
+	var is_mac_os = navigator.platform.indexOf('Mac') > -1;
+
 	(function() {
 		var range = document.createRange();
 		var text = $('selected').childNodes[0];
@@ -236,6 +242,10 @@
 
 	$('recommend').onclick = function(e) {
 		shareMessage(e, '我正在用 @锐风 开发的有饭同享, 很赞的 Chrome 扩展! 分享网页/图片非常方便! http://is.gd/fanjoy');
+	}
+
+	if (is_mac_os) {
+		document.body.classList.add('mac');
 	}
 </script>
 </html>

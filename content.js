@@ -2,6 +2,7 @@
 var ce = chrome.extension;
 var $ = console.log.bind(console);
 var de = document.documentElement;
+var is_mac_os = navigator.platform.indexOf('Mac') > -1;
 
 var dragging = false;
 var cursor_pos = {};
@@ -318,12 +319,16 @@ function onMouseUp(e) {
 }
 
 function onContextMenu(e) {
+	if (is_mac_os) {
+		setCursorPos(e);
+		return;
+	}
 	if (! isMouseActionEnabled()) {
 		dragging = false;
 		return;
 	}
 	setTimeout(endSharing, 0);
-	if (! e.metaKey && mouse_status.button !== 2) return;
+	if (mouse_status.button !== 2) return;
 	if (dragging) {
 		// 如果刚刚在拖动, 则避免上下文菜单出现
 		e.preventDefault();
@@ -343,8 +348,10 @@ disableSharing();
 getSettings();
 
 de.addEventListener('contextmenu', onContextMenu, false);
-de.addEventListener('mousedown', onMouseDown, false);
-de.addEventListener('mouseup', onMouseUp, false);
+if (! is_mac_os) {
+	de.addEventListener('mousedown', onMouseDown, false);
+	de.addEventListener('mouseup', onMouseUp, false);
+}
 
 (function() {
 	// 每次重新加载时, 接触事件绑定, 方便测试
@@ -356,11 +363,9 @@ de.addEventListener('mouseup', onMouseUp, false);
 	window.addEventListener(event_type, function onExtReloaded() {
 		window.removeEventListener(event_type, onExtReloaded, false);
 		de.removeEventListener('contextmenu', onContextMenu, false);
-		de.removeEventListener('mousedown', onMouseDown, false);
-		de.removeEventListener('mouseup', onMouseUp, false);
+		if (! is_mac_os) {
+			de.removeEventListener('mousedown', onMouseDown, false);
+			de.removeEventListener('mouseup', onMouseUp, false);
+		}
 	}, false);
 })();
-
-
-// todo: 右键菜单事件
-

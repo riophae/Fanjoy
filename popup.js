@@ -24,6 +24,7 @@ var $$ = document.querySelectorAll.bind(document);
 var log = console.log.bind(console);
 var de = document.documentElement;
 var html_style = document.defaultView.getComputedStyle(de, null);
+var is_mac_os = navigator.platform.indexOf('Mac') > -1;
 
 var min_height = Fanjoy.defaultStyle.minContentHeight;
 
@@ -774,3 +775,7 @@ w.addEventListener('paste', function (e) {
 
 $('version').textContent = 'ver ' + Fanjoy.version;
 $('successCount').textContent = Fanjoy.getSuccessCount();
+
+if (is_mac_os) {
+	$('mouseOptions').hidden = true;
+}

@@ -411,13 +411,6 @@ var settings = {
 	current: {}
 };
 
-(function() {
-	var is_mac_os = navigator.platform.indexOf('Mac') > -1;
-	if (is_mac_os) {
-		settings.default.enableGesture = false;
-	}
-});
-
 var Fanjoy = this.Fanjoy = {
 	version: (function() {
 		var xhr = new XMLHttpRequest;
