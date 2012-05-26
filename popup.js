@@ -243,6 +243,7 @@ function showOverlay(ol) {
 }
 
 function showInquiry(msg, ok, ng) {
+	focusOnPopup();
 	$('inquiryMsg').textContent = msg;
 	$('inquiryOK').onclick = ok;
 	$('inquiryNG').onclick = ng;
