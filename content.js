@@ -231,7 +231,7 @@ function isMouseActionEnabled() {
 }
 
 function onMouseDown(e) {
-	if (! isMouseActionEnabled() || e.metaKey) {
+	if (! isMouseActionEnabled()) {
 		dragging = false;
 		return;
 	}
@@ -250,8 +250,6 @@ function onMouseDown(e) {
 		settings.ctrlKey !== e.ctrlKey) {
 			return endSharing();
 	}
-	//if (dragging) return;
-	//dragging = false;
 
 	source = e.target;
 	// 接受的拖拽来源: img/canvas/a, 或者选中了文本
@@ -273,7 +271,7 @@ function onMouseDown(e) {
 }
 
 function onMouseUp(e) {
-	if (! isMouseActionEnabled() || e.metaKey) {
+	if (! isMouseActionEnabled()) {
 		dragging = false;
 		return;
 	}
