@@ -650,24 +650,25 @@ function switchAccount() {
 		var current_id; // 在饭否登录的账号 ID
 		var code = '';
 
-		code = '<p>请先登录您想要切换到的账号, 之后完成验证操作.</p>';
-
 		if (result) {
 			current_id = decodeURIComponent(result[1]);
 			var current_name = html.match(/<title> 饭否 \| 欢迎你，(.+)<\/title>/)[1];
 			code += '<p>';
-			code += '当前登录: <strong>' + current_name + '</strong>, ';
+			code += '当前登录账号为 <strong>' + current_name + '</strong>, ';
 			code += current_id == Fanjoy.account.id ?
-				'已通过验证.' : '已通过验证: ' + '<strong>' + Fanjoy.account.screen_name + '</strong>.';
+				'已通过验证.' : '已通过验证账号为 ' + '<strong>' + Fanjoy.account.screen_name + '</strong>.';
 			code += '</p>';
 			if (current_id != Fanjoy.account.id) {
 				code += '<p>若不希望切换到<strong>' + current_name + '</strong>, 请先 ';
 			}
-			code += '<button id="logoutFF">登出</button><span class="arrow">&raquo;</span>';
+			code += '<button id="logoutFF">登出</button>';
+		} else {
+			code = "点击按钮完成账号切换 ";
 		}
-		code += '<button id="login">登录</button>';
-		code += (current_id && current_id != Fanjoy.account.id) ?
-			'</p>' : '<span class="arrow">&raquo;</span>';
+		if (current_id) {
+			code += current_id != Fanjoy.account.id ?
+				' .</p>' : '<span class="arrow">&raquo;</span>';
+		}
 		code += '<button id="authorize">验证</button>';
 
 		reset_inner.innerHTML = code;
@@ -690,10 +691,6 @@ function switchAccount() {
 					logout_btn.classList.remove('busy');
 				}
 			});
-		}
-
-		$('login').onclick = function() {
-			Fanjoy.showLogin();
 		}
 
 		$('authorize').onclick = function() {
