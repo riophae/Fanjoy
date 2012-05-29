@@ -190,7 +190,6 @@
 		}
 	});
 </script>
-<script src="disable.js"></script>
 <script src="content.js"></script>
 <script>
 	var $ = document.getElementById.bind(document);
@@ -201,8 +200,6 @@
 	var bg_win = chrome.extension.getBackgroundPage();
 	var Ripple = bg_win.Ripple;
 	var Fanjoy = bg_win.Fanjoy;
-
-	var is_mac_os = navigator.platform.indexOf('Mac') > -1;
 
 	(function() {
 		var range = document.createRange();
