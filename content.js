@@ -13,13 +13,6 @@ resetMouseStatus();
 
 var settings = {};
 
-var image_types = {
-	'jpeg': 'image/jpeg',
-	'jpg': 'image/jpeg',
-	'png': 'image/png',
-	'gif': 'image/gif'
-};
-
 function mixin(to, from) {
 	for (var key in from) {
 		if (from[key] instanceof Object)
@@ -93,8 +86,8 @@ Port.prototype = {
 		var post = function() {
 			if (type == 'post_details') {
 				msg.page_tit = document.title;
-				msg.page_url = window.location.href;
-				msg.sel = window.getSelection() + '';
+				msg.page_url = location.href;
+				msg.sel = getSelection() + '';
 			}
 			this.port.postMessage({
 				type: type,
@@ -124,6 +117,87 @@ Port.prototype = {
 	}
 };
 
+function loadImageInfo(strUrl, fncCallback, fncError) {
+	function BinaryFile(data) {
+		this.getRawData = function() {
+			return data;
+		}
+
+		this.getByteAt = function(iOffset) {
+			return data.charCodeAt(iOffset) & 0xFF;
+		}
+
+		this.getLength = function() {
+			return data.length || 0;
+		}
+
+		this.getStringAt = function(iOffset, iLength) {
+			var aStr = [];
+			for (var i = iOffset, j = 0; i < iOffset + iLength; i++, j++) {
+				aStr[j] = String.fromCharCode(this.getByteAt(i));
+			}
+			return aStr.join('');
+		}
+	}
+
+	function BinaryAjax(strURL, fncCallback, fncError) {
+		var xhr = new XMLHttpRequest();
+
+		if (fncCallback) {
+			xhr.onload = function() {
+				if (xhr.status == '200' || xhr.status == '206') {
+					this.binaryResponse = new BinaryFile(this.responseText);
+					this.fileSize = this.getResponseHeader('Content-Length');
+					fncCallback(this);
+				} else {
+					if (fncError) fncError();
+				}
+				xhr = null;
+			};
+		}
+
+		if (fncError) {
+			xhr.onerror = fncError;
+		}
+
+		xhr.open('GET', strURL, true);
+		xhr.overrideMimeType('text/plain; charset=x-user-defined');
+		xhr.setRequestHeader('If-Modified-Since', 'Sat, 1 Jan 1970 00:00:00 GMT');
+		xhr.send(null);
+	}
+
+	function detectFormat(data) {
+		if (data.getByteAt(0) == 0xFF && data.getByteAt(1) == 0xD8)
+			return 'JPEG';
+
+		if (data.getByteAt(0) == 0x89 && data.getStringAt(1, 3) == 'PNG')
+			return 'PNG';
+
+		if (data.getStringAt(0,3) == 'GIF')
+			return 'GIF';
+
+		if (data.getByteAt(0) == 0x42 && data.getByteAt(1) == 0x4D)
+			return 'BMP';
+
+		return 'UNKNOWN';
+	}
+
+	BinaryAjax(
+		strUrl,
+		function(http) {
+			var info = {
+				format: detectFormat(http.binaryResponse),
+				binaryData: http.binaryResponse.getRawData()
+			};
+
+			if (fncCallback) {
+				fncCallback(info);
+			}
+		},
+		fncError
+	);
+}
+
 function shareImage(url) {
 	var src = url || ((source || {}).src);
 	if (! src) return;
@@ -152,43 +226,16 @@ function shareImage(url) {
 		port.postMessage('update_photo', { });
 	}
 
-	var xhr = new XMLHttpRequest;
-	xhr.open('GET', src, true);
-	xhr.overrideMimeType('text/plain; charset=x-user-defined');
-
-	xhr.onload = function() {
-		if (! xhr.response || xhr.status < 200 || xhr.status >= 300) {
-			updatePhotoError();
-			return;
-		}
-
-		var content_type;
-		var pos = src.lastIndexOf('.');
-		var ext = src.substring(pos + 1);
-		if (ext.length >= 3) {
-			content_type = image_types[ext.toLowerCase()] || 'image/jpeg';
-		}
-
-		try {
-			var _content_type = xhr.getResponseHeader('Content-type');
-		} catch (e) { }
-		content_type = _content_type || content_type;
-
+	loadImageInfo(src, function(data) {
 		port.postMessage('update_photo', {
-			img_data: xhr.response,
-			img_type: content_type
+			img_data: data.binaryData,
+			img_type: 'image/' + data.format.toLowerCase()
 		});
-	}
-
-	xhr.onerror = function() {
-		updatePhotoError();
-	}
-
-	xhr.send(null);
+	}, updatePhotoError);
 }
 
 function shareSelection(from_context_menu) {
-	selection = window.getSelection() + '';
+	selection = getSelection() + '';
 	if (! selection.length && ! from_context_menu) return;
 	var port = new Port;
 	port.postMessage('post_details', {
@@ -254,7 +301,7 @@ function onMouseDown(e) {
 	source = e.target;
 	// 接受的拖拽来源: img/canvas/a, 或者选中了文本
 	if (['img', 'canvas', 'a'].indexOf(source.tagName.toLowerCase()) === -1 &&
-		! window.getSelection().toString()) {
+		! getSelection().toString()) {
 		endSharing();
 		return;
 	}
@@ -356,10 +403,10 @@ if (! is_mac_os) {
 	var event_type = 'FanjoyLoaded';
 	var event = document.createEvent('MessageEvent');
 	event.initMessageEvent(event_type);
-	window.dispatchEvent(event);
+	dispatchEvent(event);
 
-	window.addEventListener(event_type, function onExtReloaded() {
-		window.removeEventListener(event_type, onExtReloaded, false);
+	addEventListener(event_type, function onExtReloaded() {
+		removeEventListener(event_type, onExtReloaded, false);
 		de.removeEventListener('contextmenu', onContextMenu, false);
 		if (! is_mac_os) {
 			de.removeEventListener('mousedown', onMouseDown, false);

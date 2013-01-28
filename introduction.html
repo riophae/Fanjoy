@@ -181,68 +181,7 @@
 		<p>喜欢这个扩展? <a id="recommend">把它推荐给各位饭友</a>吧! :) 也欢迎你来<a href="http://is.gd/fanjoy" target="_blank">扩展主页</a>, 说说你的意见!</p>
 	</div>
 </body>
-<script>
-	var ce = chrome.extension;
-	ce.onMessage = ce.onMessage || ce.onRequest;
-	ce.onMessage.addListener(function(msg) {
-		if (msg.type = 'do' && msg.code) {
-			window.eval(msg.code);
-		}
-	});
-</script>
+<script src="listen.js"></script>
 <script src="content.js"></script>
-<script>
-	var $ = document.getElementById.bind(document);
-	var $$ = function(rule, elem) {
-		return (elem || document).querySelectorAll(rule);
-	}
-
-	var bg_win = chrome.extension.getBackgroundPage();
-	var Ripple = bg_win.Ripple;
-	var Fanjoy = bg_win.Fanjoy;
-
-	(function() {
-		var range = document.createRange();
-		var text = $('selected').childNodes[0];
-		var keyword = '一段文字';
-		var start_pos = text.textContent.indexOf(keyword);
-		range.setStart(text, start_pos);
-		range.setEnd(text, start_pos + keyword.length);
-		window.getSelection().addRange(range);
-	})();
-
-	var wrapper = $('wrapper');
-
-	var check_interval = setInterval(function() {
-		if (! Fanjoy.user) return;
-		clearInterval(check_interval);
-
-		var status = $$('h3 .comment')[0];
-		status.style.color = 'green';
-		status.textContent = '已完成初始化.';
-
-		getSettings();
-	}, 16);
-
-	function shareMessage(e, msg) {
-		setCursorPos(e);
-		var port = new Port;
-		port.postMessage('post_details', {
-			type: 'status',
-			status: msg
-		});
-	}
-
-	$('feedback').onclick = function(e) {
-		shareMessage(e, '@锐风 我发现了有饭同享的一个问题:');
-	}
-
-	$('recommend').onclick = function(e) {
-		shareMessage(e, '我正在用 @锐风 开发的有饭同享, 很赞的 Chrome 扩展! 分享网页/图片非常方便! http://is.gd/fanjoy');
-	}
-
-	if (is_mac_os) {
-		document.body.classList.add('mac');
-	}
-</script>
+<script src="introduction.js"></script>
 </html>

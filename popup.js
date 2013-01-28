@@ -22,6 +22,7 @@ var w = window;
 var $ = document.getElementById.bind(document);
 var $$ = document.querySelectorAll.bind(document);
 var log = console.log.bind(console);
+var noop = function() {};
 var de = document.documentElement;
 var html_style = document.defaultView.getComputedStyle(de, null);
 var is_mac_os = navigator.platform.indexOf('Mac') > -1;
@@ -44,13 +45,12 @@ function forEach(arr, func, context) {
 	return Array.prototype.forEach.call(arr, func, context);
 }
 
-var full_width = html_style.width;
-
 var wrapper = $('wrapper');
 var main = $('main');
 var inner = $('inner');
 
-var progress_bar = $('progress');
+var progress = $('progress');
+var progress_bar = $('progress-bar');
 
 var inputarea = $('inputArea');
 var show = $('showArea');
@@ -75,13 +75,14 @@ var template_type = $('templateType');
 var template_code = $('templateCode');
 var available_keys = $('availableKeys');
 
-template_type.onchange = function(e) {
+var template_type_onchange = function(e) {
 	var templates = getTemplates();
 	template_code.value = templates[this.value];
 	template_code.default = bg_win.settings.default.templates[this.value];
 }
+template_type.addEventListener('change', template_type_onchange, false);
 
-template_code.onchange = template_code.onkeydown = throttle(function(e) {
+var template_code_listener = throttle(function(e) {
 	if (this.value == this.default) return;
 	if (! this.value.length) this.value = this.default;
 	var settings = { templates: {} };
@@ -89,40 +90,42 @@ template_code.onchange = template_code.onkeydown = throttle(function(e) {
 	Fanjoy.setSettings(settings);
 }, 40);
 
-available_keys.onchange = function(e) {
+template_code.addEventListener('change', template_code_listener, false);
+template_code.addEventListener('keydown', template_code_listener, false);
+
+available_keys.addEventListener('change', function(e) {
 	if (this.value == '___') return;
 	template_code.value += ' $' + this.value;
 	this.value = '___';
-	template_code.onchange.call(template_code);
-}
+	template_code_listener.call(template_code);
+}, false);
 
 inner.style.minHeight = min_height + 'px';
 inner.style.maxHeight = Fanjoy.defaultStyle.maxContentHeight + 'px';
 
-progress_bar.style.width = full_width;
-
-inputarea.oninput = adjustSize;
-inputarea.onkeyup = throttle(count, 100);
-inputarea.onkeydown = throttle(function(e) {
+inputarea.addEventListener('input', adjustSize, false);
+inputarea.addEventListener('keyup', throttle(count, 100), false);
+inputarea.addEventListener('keydown', throttle(function(e) {
 	if (e.ctrlKey && e.keyCode === 13) {
 		button.click();
 	}
-}, 100);
-button.onclick = submit;
+}, 100), false);
+button.addEventListener('click', submit, false);
 
-forEach(hide_btns, function(hide_btn) {
-	hide_btn.onclick = function(e) {
-		var elem = this.parentElement;
-		elem.classList.remove('focusInFromBottom');
-		elem.classList.add('focusOutFromTop');
-		setTimeout(function() {
-			elem.style.display = 'none';
-		}, 150);
-		if (e) {
-			e.preventDefault();
-			e.stopPropagation();
-		}
+var hide_btn_onclick = function(e) {
+	var elem = this.parentElement;
+	elem.classList.remove('focusInFromBottom');
+	elem.classList.add('focusOutFromTop');
+	setTimeout(function() {
+		elem.style.display = 'none';
+	}, 150);
+	if (e) {
+		e.preventDefault();
+		e.stopPropagation();
 	}
+}
+forEach(hide_btns, function(hide_btn) {
+	hide_btn.addEventListener('click', hide_btn_onclick, false);
 });
 
 [
@@ -147,7 +150,7 @@ show_options.addEventListener('click', function(e) {
 	acting = true;
 
 	var settings = Fanjoy.getSettings();
-	template_type.onchange.call(template_type);
+	template_type_onchange.call(template_type);
 
 	enable_mouse_action.checked = settings.enableGesture || settings.enableMidButton;
 	mouse_action.value = settings.enableMidButton ? 'clickMiddleButton' : 'rightButtonDrag';
@@ -155,7 +158,7 @@ show_options.addEventListener('click', function(e) {
 
 	acting = false;
 }, false);
-options.onchange = function(e) {
+options.addEventListener('change', function(e) {
 	if (acting) return;
 	var enable = enable_mouse_action.checked;
 	Fanjoy.setSettings({
@@ -163,7 +166,7 @@ options.onchange = function(e) {
 		enableMidButton: enable && mouse_action.value == 'clickMiddleButton',
 		ctrlKey: ctrl_key.checked
 	});
-}
+}, false);
 
 
 function throttle(func, delay) {
@@ -204,7 +207,7 @@ function adjustSize(e) {
 		cacheSize();
 	} else {
 		w.resizeTo(Fanjoy.defaultStyle.winWidth, delta + parseInt(bd_style.height));
-    onAdjustSize();
+		onAdjustSize();
 	}
 	onSizeAdjusted();
 }
@@ -229,10 +232,12 @@ function adjustSizeForPic() {
 	if (pic.complete) {
 		callback();
 	} else {
-		pic.onload = callback;
-		pic.onerror = function() {
+		if (pic.binded) return;
+		pic.binded = true;
+		pic.addEventListener('load', callback, false);
+		pic.addEventListener('error', function() {
 			showError('图片加载失败, 操作无法继续.', true);
-		}
+		}, false);
 	}
 }
 
@@ -244,9 +249,10 @@ function showOverlay(ol) {
 
 function showInquiry(msg, ok, ng) {
 	focusOnPopup();
+	inquiry.innerHTML += ''; // 强制取消事件绑定
 	$('inquiryMsg').textContent = msg;
-	$('inquiryOK').onclick = ok;
-	$('inquiryNG').onclick = ng;
+	$('inquiryOK').addEventListener('click', ok, false);
+	$('inquiryNG').addEventListener('click', ng, false);
 	showOverlay(inquiry);
 }
 
@@ -318,6 +324,7 @@ function setPicTitle() {
 			}
 			size = Math.round(size * 10) / 10 + units[0] + 'B';
 			pic.parentElement.title += '@' + size;
+			pic.parentElement.title += '(' + data.img_data.type.match(/\/(.+)$/)[1].toUpperCase() + ')';
 		}
 	}
 }
@@ -352,8 +359,7 @@ function submit() {
   if (button.disabled) return;
 
 	button.classList.add('loading');
-	progress_bar.value = 0;
-
+	progress_bar.style.width = '0';
 	setContent(inputarea.textContent);
 
 	shorten().
@@ -364,13 +370,15 @@ function submit() {
 	error(function(e) {
 		var error = e.status ?
 			'连接 ' +
-			e.url +
+			e.response.request +
 			' 时发生 ' +
 			e.status +
 			' 错误:<br />' +
 			e.exceptionType +
 			' / ' +
-			e.statusText
+			e.statusText +
+			'<br />' +
+			(e.response ? (e.response.error || '') : '')
 			:
 			e.exceptionType +
 			' / 请检查网络连接.';
@@ -400,7 +408,6 @@ function shorten(links, force) {
 		}
 		var d = Ripple.shorten['is.gd'](link).hold(log).
 			next(function(short_url) {
-				//console.log('long: ' + link + '\nshort: ' + short_url);
 				setContent(inputarea.textContent.replace(link, short_url));
 			}).
 			error(function(e) {
@@ -419,7 +426,7 @@ function shorten(links, force) {
 		var d = new Deferred;
 		var msg = '字数超过 140 字, 如果直接发送, 消息将被截断. 确定要这样做吗?';
 		var ng = function() {
-			$$('.hide')[0].onclick.call(inquiry.children[0]);
+			hide_btn_onclick.call(inquiry.children[0]);
 			enableButton();
 		}
 		showInquiry(msg, d.call.bind(d), ng);
@@ -443,24 +450,25 @@ function post() {
 			adjustSize();
 			disableButton('Submitting..', '正在提交..');
 			if (img_data) {
-				progress_bar.style.display = 'block';
+				progress.style.display = 'block';
 			}
 		},
 		onprogress: function(e) {
 			if (! img_data || ! e.lengthComputable) return;
-			var progress = e.loaded / e.total;
-			progress_bar.value = progress * 100;
-			document.title = '有饭同享 (' + Math.floor(progress * 100) + '%)';
+			var percent = Math.floor(e.loaded / e.total * 100);
+			progress_bar.style.width = percent + '%';
+			document.title = '有饭同享 (' + percent + '%)';
 
-			if (progress > 0.33 && progress <= 0.66)
-				progress_bar.className = 'b';
-			else if (progress > 0.66)
-				progress_bar.className = 'c';
+			if (percent > 33 && percent <= 66)
+				progress.className = 'b';
+			else if (percent > 66)
+				progress.className = 'c';
 			else
-				progress_bar.className = 'a';
+				progress.className = 'a';
 		},
 		oncomplete: function() {
-			progress_bar.style.display = 'none';
+			progress.style.display = 'none';
+			document.title = '有饭同享';
 		}
 	};
 
@@ -496,6 +504,7 @@ function processImage() {
 	} else {
 		if (Ripple.helpers.type(img_url) != 'object') {
 			disableButton('Loading..', '加载');
+			button.classList.add('loading');
 		}
 		if (data.fromBG) {
 			pic.src = img_url;
@@ -569,25 +578,25 @@ function setContent(content) {
 
 function buildPhotoBlob(msg) {
 	var utf8_string = msg.img_data;
-	var content_type = msg.img_type;
 
-	var byte_array = new Uint8Array(utf8_string.length);
+	var array = [];
 	for (var i = 0, len = utf8_string.length; i < len; i++) {
-		byte_array[i] = utf8_string.charCodeAt(i) & 0xff;
+		array[i] = utf8_string.charCodeAt(i) & 0xff;
 	}
+	var byte_array = new Uint8Array(array);
 
 	var bb = new (w.BlobBuilder || w.WebKitBlobBuilder);
-	bb.append(byte_array.buffer);
+	bb.append(byte_array);
 
-	var blob = content_type ? bb.getBlob(content_type) : bb.getBlob();
+	var blob = bb.getBlob(msg.img_type);
 	data.img_data = blob;
 
 	var fr = new FileReader;
-	fr.onload = function() {
+	fr.addEventListener('load', function() {
 		pic.src = fr.result;
 		adjustSizeForPic();
 		enableButton();
-	}
+	}, false);
 	fr.readAsDataURL(blob);
 }
 
@@ -604,10 +613,10 @@ function onMessage(req, sender, response) {
 	}
 	else if (req.type === 'update_photo') {
 		var msg = req.msg;
-		if (! msg.img_data) {
-			showError('图片加载失败, 操作无法继续.', true);
-		} else {
+		if (msg.img_data) {
 			buildPhotoBlob(msg);
+		} else {
+			showError('图片加载失败, 操作无法继续.', true);
 		}
 	}
 }
@@ -673,30 +682,35 @@ function switchAccount() {
 
 		reset_inner.innerHTML = code;
 
-		($('logoutFF') || {}).onclick = function() {
-			var logout_btn = this;
-			if (logout_btn.classList.contains('disabled')) return;
-			var url = 'http://m.fanfou.com' + html.match(/<a href="(\/logout\/[^"]+)">/)[1];
-			Ripple.ajax(url, {
-				onstart: function() {
-					logout_btn.classList.add('disabled');
-					logout_btn.textContent = '...';
-				},
-				success: function() {
-					logout_btn.textContent = '已登出';
-					logout_btn.onclick = null;
-				},
-				error: function() {
-					logout_btn.textContent = '登出';
-					logout_btn.classList.remove('busy');
-				}
-			});
+		if ($('logoutFF')) {
+			$('logoutFF').addEventListener('click', function logout_onclick() {
+				var logout_btn = this;
+				if (logout_btn.classList.contains('disabled')) return;
+				var url = 'http://m.fanfou.com' + html.match(/<a href="(\/logout\/[^"]+)">/)[1];
+				Ripple.ajax(url, {
+					onstart: function() {
+						logout_btn.classList.add('disabled');
+						logout_btn.textContent = '...';
+					},
+					success: function() {
+						logout_btn.textContent = '已登出';
+						logout_btn.onclick = null;
+					},
+					error: function() {
+						logout_btn.textContent = '登出';
+						logout_btn.classList.remove('busy');
+					},
+					oncomplete: function() {
+						logout_btn.removeEventListener('click', logout_onclick, false);
+					}
+				});
+			}, false);
 		}
 
-		$('authorize').onclick = function() {
+		$('authorize').addEventListener('click', function() {
 			Fanjoy.reset();
 			Fanjoy.closeAllPopup();
-		}
+		}, false);
 	}).
 	error(function(e) {
 		reset_inner.innerHTML = '发生致命错误, 操作无法继续.';
@@ -706,7 +720,7 @@ function switchAccount() {
 var fixSize = throttle(function() {
 	// 修正
 	resizing = true;
-	if (delta < 10 || delta > 35) {
+	if (delta < 10 || delta > 38) {
 		cacheSize();
 	} else {
 		w.resizeTo(Fanjoy.defaultStyle.winWidth, delta + parseInt(html_style.height));
