@@ -244,8 +244,13 @@ function initialize() {
 		}).
 		error(function(event) {
 			if (event.status) {
-				// access token 无效
-				reset();
+				if (event.status === 401) {
+					// access token 无效
+					reset();
+				} else {
+					// 可能 API Hits 用光了, 延时重试
+					setTimeout(initialize, 60000);
+				}
 			} else {
 				// 网络错误
 				if (Fanjoy.account) {
