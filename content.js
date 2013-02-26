@@ -227,6 +227,9 @@ function shareImage(url) {
 	}
 
 	loadImageInfo(src, function(data) {
+		if (data.format === 'UNKNOWN')
+			data.format = 'PNG';
+
 		port.postMessage('update_photo', {
 			img_data: data.binaryData,
 			img_type: 'image/' + data.format.toLowerCase()
