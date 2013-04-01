@@ -248,11 +248,17 @@ function showOverlay(ol) {
 }
 
 function showInquiry(msg, ok, ng) {
+	var hide = function() {
+		hide_btn_onclick.call(inquiry.children[0]);
+	}
+
 	focusOnPopup();
 	inquiry.innerHTML += ''; // 强制取消事件绑定
 	$('inquiryMsg').textContent = msg;
 	$('inquiryOK').addEventListener('click', ok, false);
+	$('inquiryOK').addEventListener('click', hide, false);
 	$('inquiryNG').addEventListener('click', ng, false);
+	$('inquiryNG').addEventListener('click', hide, false);
 	showOverlay(inquiry);
 }
 
@@ -362,7 +368,8 @@ function submit() {
 	progress_bar.style.width = '0';
 	setContent(inputarea.textContent);
 
-	shorten().
+	checkPhoto().
+	next(shorten).
 	next(post).
 	next(Fanjoy.setSuccessCount).
 	next(checkSuccessCount).
@@ -389,6 +396,15 @@ function submit() {
 	hold(function() {
 		button.classList.remove('loading');
 	});
+}
+
+function checkPhoto() {
+	if (! data.img_data || data.img_data.size <= 2 * 1024 * 1024) {
+		return Deferred.next();
+	}
+	var d = new Deferred;
+	showInquiry('您将要分享的图片大小超过 2M, 可能会上传失败. 确定继续吗?', d.call.bind(d), noop);
+	return d;
 }
 
 function shorten(links, force) {
@@ -425,11 +441,7 @@ function shorten(links, force) {
 		}
 		var d = new Deferred;
 		var msg = '字数超过 140 字, 如果直接发送, 消息将被截断. 确定要这样做吗?';
-		var ng = function() {
-			hide_btn_onclick.call(inquiry.children[0]);
-			enableButton();
-		}
-		showInquiry(msg, d.call.bind(d), ng);
+		showInquiry(msg, d.call.bind(d), enableButton);
 		return d;
 	});
 	return dl;
