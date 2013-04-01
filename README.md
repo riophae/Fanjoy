@@ -38,3 +38,8 @@ http://is.gd/fanjoy
 **ver 0.3.0**
 * 更新至 manifest v2
 * 细节调整
+* 上传大于 2M 的图片时提示用户
+* 关闭分享窗口则立即取消分享
+* 更新 CSS 使之向后兼容未来版本 Chrome
+* 修正对图片格式的判断
+* 修正 "Access Token 失效" 的判断逻辑
