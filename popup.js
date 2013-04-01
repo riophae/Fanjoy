@@ -14,6 +14,8 @@ var Deferred = bg_win.Deferred;
 var lscache = bg_win.lscache;
 var Fanjoy = bg_win.Fanjoy;
 
+var ajax;
+
 var bd_style = {};
 bd_style = document.defaultView.getComputedStyle(document.body, null);
 cacheSize();
@@ -481,10 +483,12 @@ function post() {
 		oncomplete: function() {
 			progress.style.display = 'none';
 			document.title = '有饭同享';
+			ajax = null;
 		}
 	};
 
-	return Fanjoy.user[img_data ? 'postPhoto' : 'postStatus'](params).setupAjax(ajax_options);
+	ajax = Fanjoy.user[img_data ? 'postPhoto' : 'postStatus'](params).setupAjax(ajax_options);
+	return ajax;
 }
 
 function processData() {
@@ -795,6 +799,10 @@ w.addEventListener('paste', function (e) {
 
 	selection.removeAllRanges();
 	selection.addRange(range);
+}, false);
+
+w.addEventListener('unload', function() {
+	ajax && ajax.cancel();
 }, false);
 
 $('version').textContent = 'ver ' + Fanjoy.version;
