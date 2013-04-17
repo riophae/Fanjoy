@@ -523,12 +523,22 @@ function processImage() {
 			button.classList.add('loading');
 		}
 		if (data.fromBG) {
-			pic.src = img_url;
-			Ripple.helpers.buildPhotoBlob(img_url).
-			next(function(blob) {
-				data.img_data = blob;
-				adjustSizeForPic();
-				enableButton();
+			loadImageInfo(img_url, function(data) {
+				if (data.format === 'UNKNOWN')
+					data.format = 'PNG';
+
+				onMessage({
+					type: 'update_photo',
+					msg: {
+						img_data: data.binaryData,
+						img_type: 'image/' + data.format.toLowerCase()
+					}
+				});
+			}, function() {
+				onMessage({
+					type: 'update_photo',
+					msg: { }
+				});
 			});
 		}
 	}

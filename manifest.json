@@ -8,7 +8,7 @@
 		]
 	},
 	"content_scripts": [ {
-		"js": [ "content.js" ],
+		"js": [ "image_loader.js", "content.js" ],
 		"matches": [ "http://*/*", "https://*/*" ],
 		"run_at": "document_end"
 	} ],
