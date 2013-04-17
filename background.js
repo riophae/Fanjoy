@@ -13,9 +13,6 @@ Ripple.
 setupConsumer({
 	key: 'c4640921f55d6552ad5d4f7d46813194',
 	secret: '912d175718e5af2ea126b64981927a81'
-}).
-config({
-	//dumpLevel: 3
 });
 
 function onMessage(msg, sender, sendResponse) {
@@ -73,8 +70,8 @@ function onConnect(page_port) {
 
 function createPopup(pos, callback) {
 	var max_pos = {
-		x: window.screen.width - Fanjoy.defaultStyle.winWidth,
-		y: window.screen.height - Fanjoy.defaultStyle.winHeight
+		x: screen.width - Fanjoy.defaultStyle.winWidth,
+		y: screen.height - Fanjoy.defaultStyle.winHeight
 	};
 	pos = pos || { x: 200, y: 200 };
 	pos.x = Math.min(max_pos.x, pos.x);
@@ -181,8 +178,7 @@ function setupContextMenus() {
 function validTab(tab) {
 	if (! tab.url) return false;
 	return tab.url.indexOf('http://') == 0 ||
-		tab.url.indexOf('https://') == 0 ||
-		/*tab.url.indexOf('file:///') == 0 || */false;
+		tab.url.indexOf('https://') == 0;
 }
 
 function closeTab(id) {
@@ -303,12 +299,8 @@ function initialize() {
 				});
 
 				ct.insertCSS(id, {
-					code: '#retry {' +
-								'	text-decoration: underline;' +
-								'}' +
-								'#retry:hover {' +
-								'	cursor: pointer;' +
-								'}'
+					code: '#retry { text-decoration: underline; }' +
+								'#retry:hover { cursor: pointer; }'
 				});
 			});
 
@@ -328,7 +320,7 @@ function initialize() {
 
 		// 首次运行且完成验证后, 打开入门教程
 		if (lscache.get('is_first_run') !== false) {
-			window.open('introduction.html');
+			createTab('introduction.html');
 		}
 		setTimeout(function() {
 			closeTab(tab_id);
@@ -395,11 +387,10 @@ var onContextmenus = {
 	link: ['有饭同享: 分享链接', function(info, tab) {
 		return 'shareLink("' + info.linkUrl + '");';
 	}],
+	page: ['有饭同享: 分享页面', function(info, tab) {
+		return 'shareSelection(true);';
+	}]
 };
-onContextmenus.page = [
-	'有饭同享: 分享页面',
-	onContextmenus.selection[1]
-];
 
 var settings = {
 	default: {
@@ -413,7 +404,7 @@ var settings = {
 		}
 	},
 	keys: ['page_tit', 'page_url', 'sel', 'img_desc', 'img_tit', 'img_url', 'link_url', 'link_desc', 'link_tit'],
-	current: {}
+	current: { }
 };
 
 var Fanjoy = this.Fanjoy = {
