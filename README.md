@@ -43,3 +43,4 @@ http://is.gd/fanjoy
 * 更新 CSS 使之向后兼容未来版本 Chrome
 * 修正对图片格式的判断
 * 修正 "Access Token 失效" 的判断逻辑
+* 支持在其他扩展的页面中分享 GIF 动画图片
