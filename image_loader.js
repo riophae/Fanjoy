@@ -44,7 +44,7 @@ function loadImageInfo(strUrl, fncCallback, fncError) {
 
 		xhr.open('GET', strURL, true);
 		xhr.overrideMimeType('text/plain; charset=x-user-defined');
-		xhr.setRequestHeader('If-Modified-Since', 'Sat, 1 Jan 1970 00:00:00 GMT');
+		xhr.setRequestHeader('If-Modified-Since', 'Sat, 01 Jan 2010 00:00:00 GMT');
 		xhr.send(null);
 	}
 
