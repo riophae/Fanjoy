@@ -10,7 +10,8 @@
 	"content_scripts": [ {
 		"js": [ "image_loader.js", "content.js" ],
 		"matches": [ "http://*/*", "https://*/*" ],
-		"run_at": "document_end"
+		"run_at": "document_end",
+		"all_frames": true
 	} ],
 	"description": "\u901a\u8fc7\u53f3\u952e \u62d6\u62fd/\u83dc\u5355 \u5206\u4eab \u7f51\u9875/\u56fe\u7247/\u6587\u5b57/\u94fe\u63a5 \u5230\u996d\u5426. \u652f\u6301\u56fe\u7247\u76f4\u63a5\u4e0a\u4f20, \u81ea\u5b9a\u4e49\u6a21\u677f, \u81ea\u52a8\u538b\u7f29\u94fe\u63a5, \u5206\u4eab\u5176\u4ed6\u6269\u5c55\u4e2d\u7684\u8d44\u6e90\u7b49\u529f\u80fd.",
 	"icons": {
