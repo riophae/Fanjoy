@@ -2,7 +2,7 @@
 var ce = chrome.extension;
 var $ = console.log.bind(console);
 var de = document.documentElement;
-var is_mac_os = navigator.platform.indexOf('Mac') > -1;
+var is_windows = navigator.platform.indexOf('Win32') > -1;
 
 var dragging = false;
 var cursor_pos = {};
@@ -286,7 +286,7 @@ function onMouseUp(e) {
 }
 
 function onContextMenu(e) {
-	if (is_mac_os) {
+	if (! is_windows) {
 		setCursorPos(e);
 		return;
 	}
@@ -315,7 +315,7 @@ disableSharing();
 getSettings();
 
 de.addEventListener('contextmenu', onContextMenu, false);
-if (! is_mac_os) {
+if (is_windows) {
 	de.addEventListener('mousedown', onMouseDown, false);
 	de.addEventListener('mouseup', onMouseUp, false);
 }
@@ -330,7 +330,7 @@ if (! is_mac_os) {
 	addEventListener(event_type, function onExtReloaded() {
 		removeEventListener(event_type, onExtReloaded, false);
 		de.removeEventListener('contextmenu', onContextMenu, false);
-		if (! is_mac_os) {
+		if (is_windows) {
 			de.removeEventListener('mousedown', onMouseDown, false);
 			de.removeEventListener('mouseup', onMouseUp, false);
 		}

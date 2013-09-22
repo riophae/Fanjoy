@@ -47,6 +47,6 @@ $('recommend').addEventListener('click', function(e) {
 	shareMessage(e, '我正在用 @锐风 开发的有饭同享, 很赞的 Chrome 扩展! 分享网页/图片非常方便! http://is.gd/fanjoy');
 }, false);
 
-if (is_mac_os) {
-	document.body.classList.add('mac');
+if (! is_windows) {
+	document.body.classList.add('non-windows');
 }

@@ -27,7 +27,7 @@ var log = console.log.bind(console);
 var noop = function() {};
 var de = document.documentElement;
 var html_style = document.defaultView.getComputedStyle(de, null);
-var is_mac_os = navigator.platform.indexOf('Mac') > -1;
+var is_windows = navigator.platform.indexOf('Win32') > -1;
 
 var min_height = Fanjoy.defaultStyle.minContentHeight;
 
@@ -818,6 +818,6 @@ w.addEventListener('unload', function() {
 $('version').textContent = 'ver ' + Fanjoy.version;
 $('successCount').textContent = Fanjoy.getSuccessCount();
 
-if (is_mac_os) {
+if (! is_windows) {
 	$('mouseOptions').hidden = true;
 }
