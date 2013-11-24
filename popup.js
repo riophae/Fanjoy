@@ -365,7 +365,8 @@ function fixTransparentPNG() {
 }
 
 function submit() {
-  if (button.disabled) return;
+	if (button.disabled) return;
+	if (! data.img_data && ! inputarea.textContent.length) return;
 
 	button.classList.add('loading');
 	progress_bar.style.width = '0';
