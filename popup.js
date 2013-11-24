@@ -602,6 +602,46 @@ function setContent(content) {
 	adjustSize();
 }
 
+function isImage(type) {
+	switch (type) {
+	case 'image/jpeg':
+	case 'image/png':
+	case 'image/gif':
+	case 'image/bmp':
+	case 'image/jpg':
+		return true;
+	default:
+		return false;
+	}
+}
+
+function onpasteImage(e) {
+	var items = e.clipboardData.items;
+	if (! items.length) return;
+	var f, i = 0;
+	while (items[i]) {
+		f = items[i].getAsFile();
+		if (f && isImage(f.type))	{
+			break;
+		}
+		i++;
+	}
+	if (! f) return;
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	f.name = 'image-from-clipboard.' + f.type.replace('image/', '');
+
+	var fr = new FileReader;
+	fr.addEventListener('load', function() {
+		data.img_url = pic.src = fr.result;
+		processImage();
+		if (f.type === 'image/png') {
+			fixTransparentPNG();
+		}
+	}, false);
+	fr.readAsDataURL(f);
+}
+
 function buildPhotoBlob(msg) {
 	var utf8_string = msg.img_data;
 
@@ -760,6 +800,8 @@ w.addEventListener('resize', function(e) {
 	if (resizing) return;
 	fixSize();
 }, false);
+
+w.addEventListener('paste', onpasteImage, false);
 
 w.addEventListener('paste', function (e) {
 	if (! /text\/html/.test(e.clipboardData.types)) return;
