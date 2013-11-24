@@ -112,6 +112,7 @@ inputarea.addEventListener('keydown', throttle(function(e) {
 		button.click();
 	}
 }, 100), false);
+wrapper.addEventListener('dblclick', submit, false);
 button.addEventListener('click', submit, false);
 
 var hide_btn_onclick = function(e) {
