@@ -18,7 +18,6 @@ var ajax;
 
 var bd_style = {};
 bd_style = document.defaultView.getComputedStyle(document.body, null);
-cacheSize();
 
 var w = window;
 var $ = document.getElementById.bind(document);
@@ -105,7 +104,7 @@ available_keys.addEventListener('change', function(e) {
 inner.style.minHeight = min_height + 'px';
 inner.style.maxHeight = Fanjoy.defaultStyle.maxContentHeight + 'px';
 
-inputarea.addEventListener('input', adjustSize, false);
+inputarea.addEventListener('input', onresize, false);
 inputarea.addEventListener('keyup', throttle(count, 100), false);
 inputarea.addEventListener('keydown', throttle(function(e) {
 	if (e.ctrlKey && e.keyCode === 13) {
@@ -184,37 +183,6 @@ function throttle(func, delay) {
 	}
 }
 
-function cacheSize(callback) {
-	document.body.className = 'default';
-	delta = Fanjoy.defaultStyle.winHeight - parseInt(bd_style.height);
-	document.body.removeAttribute('class');
-}
-
-var onAdjustSize = throttle(function() {
-	var _delta = de.offsetHeight - de.clientHeight;
-	if (_delta) {
-		Fanjoy.defaultStyle.winHeight += _delta;
-		cacheSize();
-		adjustSize();
-	}
-}, 200);
-
-var onSizeAdjusted = throttle(function() {
-	resizing = false;
-}, 32);
-
-// 根据页面高度调整窗口大小
-function adjustSize(e) {
-	resizing = true;
-	if (wrapper.offsetHeight != wrapper.clientHeight) {
-		cacheSize();
-	} else {
-		w.resizeTo(Fanjoy.defaultStyle.winWidth, delta + parseInt(bd_style.height));
-		onAdjustSize();
-	}
-	onSizeAdjusted();
-}
-
 function adjustSizeForPic() {
 	function callback() {
 		pic.parentElement.classList.add('imgLoaded');
@@ -223,7 +191,7 @@ function adjustSizeForPic() {
 		var pic_height = pic.parentElement.offsetHeight;
 		min_height = Math.max(pic_height, min_height);
 		inner.style.minHeight = min_height + 'px';
-		adjustSize();
+		onresize();
 
 		if (data.img_data.type === 'image/png') {
 			fixTransparentPNG();
@@ -463,7 +431,7 @@ function post() {
 	var ajax_options = {
 		timeout: img_data ? 90000 : 15000,
 		onstart: function() {
-			adjustSize();
+			onresize();
 			disableButton('Submitting..', '正在提交..');
 			if (img_data) {
 				progress.style.display = 'block';
@@ -601,7 +569,7 @@ function applyTemplate() {
 function setContent(content) {
 	inputarea.textContent = content.clear();
 	count();
-	adjustSize();
+	onresize();
 }
 
 function isImage(type) {
@@ -785,23 +753,26 @@ function switchAccount() {
 	});
 }
 
-var fixSize = throttle(function() {
-	// 修正
+function onresize(e) {
+	if (resizing) return;
 	resizing = true;
-	if (delta < 10 || delta > 38) {
-		cacheSize();
-	} else {
-		w.resizeTo(Fanjoy.defaultStyle.winWidth, delta + parseInt(html_style.height));
-	}
-	resizing = false;
-}, 32)
+	var delta = {
+		x: outerWidth - innerWidth,
+		y: outerHeight - innerHeight
+	};
+	lscache.set('size_delta', delta);
+	Fanjoy.defaultStyle.winWidth = Fanjoy.defaultStyle.innerWidth + delta.x;
+	Fanjoy.defaultStyle.winHeight = Fanjoy.defaultStyle.innerHeight + delta.y;
+	resizeBy(Fanjoy.defaultStyle.innerWidth - innerWidth, 0);
+	setTimeout(function() {
+		resizeTo(outerWidth, parseInt(bd_style.height) + delta.y);
+		resizing = false;
+	}, 32)
+}
 
 // 阻止用户调整窗口大小
-w.addEventListener('resize', function(e) {
-	// resizing 为真表示程序正在调整窗口大小, 忽略
-	if (resizing) return;
-	fixSize();
-}, false);
+w.addEventListener('resize', onresize, false);
+setInterval(onresize, 250);
 
 w.addEventListener('paste', onpasteImage, false);
 
@@ -839,7 +810,7 @@ w.addEventListener('paste', function (e) {
 		node = node.childNodes[0] || node;
 	}
 
-	adjustSize();
+	onresize();
 	count();
 
 	if (node === inputarea) {

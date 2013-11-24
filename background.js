@@ -415,8 +415,8 @@ var Fanjoy = this.Fanjoy = {
 		return JSON.parse(xhr.responseText).version;
 	})(),
 	defaultStyle: {
-		winWidth: 300,
-		winHeight: 163,
+		innerWidth: 300,
+		innerHeight: 135,
 		minContentHeight: 45,
 		maxContentHeight: 135
 	},
@@ -460,6 +460,9 @@ var Fanjoy = this.Fanjoy = {
 	accessToken: lscache.get('access_token'), // 缓存的 access token, 与饭否服务器联络的凭证
 	user: null // 一个 Ripple 实例, 提供所有 API 接口
 };
+var delta = lscache.get('size_delta') || { x: 0, y: 0 };
+Fanjoy.defaultStyle.winWidth = Fanjoy.defaultStyle.innerWidth + delta.x;
+Fanjoy.defaultStyle.winHeight = Fanjoy.defaultStyle.innerHeight + delta.y;
 
 settings.current = Fanjoy.getSettings();
 
