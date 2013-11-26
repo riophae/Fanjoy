@@ -1,0 +1,105 @@
+@-webkit-keyframes blink {
+	from {
+		box-shadow:
+			0 999px 0 rgba(172, 172, 172, 0) inset,
+			0 .5px 0 rgba(255, 255, 255, 1) inset,
+			0 .5px 0 rgba(0, 0, 0, .09);
+		opacity: 1;
+	}
+	50% {
+		box-shadow:
+			0 999px 0 rgba(172, 172, 172, .2) inset,
+			0 .5px 0 rgba(255, 255, 255, 1) inset,
+			0 .5px 0 rgba(0, 0, 0, .09);
+		opacity: .75;
+	}
+	to {
+		box-shadow:
+			0 999px 0 rgba(172, 172, 172, 0) inset,
+			0 .5px 0 rgba(255, 255, 255, 1) inset,
+			0 .5px 0 rgba(0, 0, 0, .09);
+		opacity: 1;
+	}
+}
+@keyframes blink {
+	from {
+		box-shadow:
+			0 999px 0 rgba(172, 172, 172, 0) inset,
+			0 .5px 0 rgba(255, 255, 255, 1) inset,
+			0 .5px 0 rgba(0, 0, 0, .09);
+		opacity: 1;
+	}
+	50% {
+		box-shadow:
+			0 999px 0 rgba(172, 172, 172, .2) inset,
+			0 .5px 0 rgba(255, 255, 255, 1) inset,
+			0 .5px 0 rgba(0, 0, 0, .09);
+		opacity: .75;
+	}
+	to {
+		box-shadow:
+			0 999px 0 rgba(172, 172, 172, 0) inset,
+			0 .5px 0 rgba(255, 255, 255, 1) inset,
+			0 .5px 0 rgba(0, 0, 0, .09);
+		opacity: 1;
+	}
+}
+html {
+	background-size: 115px;
+}
+body {
+	text-shadow: 0 .5px 0 rgba(255, 255, 255, .5);
+}
+#logout span,
+#showOptions span,
+#showAbout span {
+	background-size: 24px;
+}
+#logout span {
+	background-image: url('images/logout@2x.png');
+}
+#showOptions span {
+	background-image: url('images/options@2x.png');
+}
+#showAbout span {
+	background-image: url('images/about@2x.png');
+}
+.hide {
+	background-image: url('images/hide@2x.png');
+	background-size: 24px;
+}
+[src="images/picture.png"] {
+	content: url('images/picture@2x.png');
+	width: 44px;
+	height: 32px;
+}
+button,
+#logout,
+#showOptions,
+#showAbout {
+	border-width: .5px !important;
+}
+button,
+#logout:hover,
+#showOptions:hover,
+#showAbout:hover {
+	box-shadow: 
+		0 999px 0 rgba(172, 172, 172, 0) inset,
+		0 .5px 0 rgba(255, 255, 255, .75) inset,
+		0 .5px 0 rgba(0, 0, 0, .09);
+}
+button:hover {
+	box-shadow: 
+		0 999px 0 rgba(172, 172, 172, .2) inset,
+		0 .5px 0 rgba(255, 255, 255, 1) inset,
+		0 .5px 0 rgba(0, 0, 0, .09);
+}
+button:active,
+#logout:active,
+#showOptions:active,
+#showAbout:active {
+	box-shadow: 
+		0 999px 0 rgba(0, 115, 215, .3) inset,
+		0 .5px 0 rgba(255, 255, 255, 1) inset,
+		0 .5px 0 rgba(0, 0, 0, .09);
+}
