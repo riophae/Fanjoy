@@ -86,7 +86,7 @@ template_type.addEventListener('change', template_type_onchange, false);
 var template_code_listener = throttle(function(e) {
 	if (this.value == this.default) return;
 	if (! this.value.length) this.value = this.default;
-	var settings = { templates: {} };
+	var settings = { templates: getTemplates() };
 	settings.templates[template_type.value] = template_code.value;
 	Fanjoy.setSettings(settings);
 }, 40);
