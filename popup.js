@@ -84,7 +84,6 @@ var template_type_onchange = function(e) {
 template_type.addEventListener('change', template_type_onchange, false);
 
 var template_code_listener = throttle(function(e) {
-	if (this.value == this.default) return;
 	if (! this.value.length) this.value = this.default;
 	var settings = { templates: getTemplates() };
 	settings.templates[template_type.value] = template_code.value;
@@ -92,7 +91,7 @@ var template_code_listener = throttle(function(e) {
 }, 40);
 
 template_code.addEventListener('change', template_code_listener, false);
-template_code.addEventListener('keydown', template_code_listener, false);
+template_code.addEventListener('input', template_code_listener, false);
 
 available_keys.addEventListener('change', function(e) {
 	if (this.value == '___') return;
@@ -101,7 +100,7 @@ available_keys.addEventListener('change', function(e) {
 		end = template_code.selectionEnd;
 	template_code.value = template_code.value.substring(0, start) +
 		text + template_code.value.substring(end, template_code.value.length);
-	textarea.selectionStart = textarea.selectionEnd = start + text.length;
+	template_code.selectionStart = template_code.selectionEnd = start + text.length;
 
 	this.value = '___';
 	template_code_listener.call(template_code);
