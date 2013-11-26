@@ -96,7 +96,13 @@ template_code.addEventListener('keydown', template_code_listener, false);
 
 available_keys.addEventListener('change', function(e) {
 	if (this.value == '___') return;
-	template_code.value += ' $' + this.value;
+	var text = '$' + this.value;
+	var start = template_code.selectionStart,
+		end = template_code.selectionEnd;
+	template_code.value = template_code.value.substring(0, start) +
+		text + template_code.value.substring(end, template_code.value.length);
+	textarea.selectionStart = textarea.selectionEnd = start + text.length;
+
 	this.value = '___';
 	template_code_listener.call(template_code);
 }, false);
