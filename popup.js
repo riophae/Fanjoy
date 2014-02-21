@@ -434,7 +434,7 @@ function post() {
 	if (img_data) params.photo = img_data;
 
 	var ajax_options = {
-		timeout: img_data ? 90000 : 15000,
+		timeout: img_data ? 300000 : 15000,
 		onstart: function() {
 			onresize();
 			disableButton('Submitting..', '正在提交..');
