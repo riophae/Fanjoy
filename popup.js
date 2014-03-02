@@ -257,6 +257,7 @@ function count(e) {
 
 function enableButton() {
 	inputarea.setAttribute('contenteditable', 'true');
+	inputarea.focus();
 	button.title = '分享';
 	button.textContent = 'Share!';
 	button.disabled = false;
