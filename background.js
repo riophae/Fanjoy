@@ -200,7 +200,12 @@ function closeAllPopup() {
 }
 
 function broadcast(callback) {
-	ct.query({}, function(tabs) {
+	ct.query({ 
+		url: [
+			'http://*/*',
+			'https://*/*'
+		]
+	}, function(tabs) {
 		tabs.forEach(function(tab) {
 			if (validTab(tab)) {
 				callback(tab.id);
