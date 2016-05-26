@@ -198,11 +198,7 @@ function adjustSizeForPic() {
 		inner.style.minHeight = min_height + 'px';
 		onresize();
 
-		if (data.img_data.type === 'image/png') {
-			fixTransparentPNG();
-		} else {
-			setPicTitle();
-		}
+		setPicTitle();
 	}
 	// 等待图片加载完毕
 	if (pic.complete) {
@@ -310,32 +306,6 @@ function setPicTitle() {
 			pic.parentElement.title += '(' + data.img_data.type.match(/\/(.+)$/)[1].toUpperCase() + ')';
 		}
 	}
-}
-
-function fixTransparentPNG() {
-	Ripple.helpers.image2canvas(pic).
-	next(function(canvas) {
-		var ctx = canvas.getContext('2d');
-		var image_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-		var pixel_array = image_data.data;
-		var m, a, s;
-		for (var i = 0, len = pixel_array.length; i < len; i += 4) {
-			a = pixel_array[i+3];
-			if (a === 255) continue;
-			s = 255 - a;
-			a /= 255;
-			m = 3;
-			while (m--) {
-				pixel_array[i+m] = pixel_array[i+m] * a + s;
-			}
-			pixel_array[i+3] = 255;
-		}
-		ctx.putImageData(image_data, 0, 0);
-		canvas.toBlob(function(blob) {
-			data.img_data = blob;
-			setPicTitle();
-		});
-	});
 }
 
 function submit() {
@@ -614,9 +584,6 @@ function onpasteImage(e) {
 	fr.addEventListener('load', function() {
 		data.img_url = pic.src = fr.result;
 		processImage();
-		if (f.type === 'image/png') {
-			fixTransparentPNG();
-		}
 	}, false);
 	fr.readAsDataURL(f);
 }
