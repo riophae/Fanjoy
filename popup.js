@@ -785,56 +785,6 @@ setInterval(onresize, 250);
 
 w.addEventListener('paste', onpasteImage, false);
 
-w.addEventListener('paste', function (e) {
-	if (! /text\/html/.test(e.clipboardData.types)) return;
-	e.preventDefault();
-
-	var div = document.createElement('div');
-	div.innerHTML = e.clipboardData.getData('text/html');
-	var text = div.textContent.clear();
-
-	var selection = w.getSelection();
-	var node = selection.focusNode;
-
-	if (! node || ! inputarea.contains(node)) return;
-
-	if (selection.toString().length) {
-		selection.deleteFromDocument();
-		if (! inputarea.textContent.length) {
-			inputarea.innerHTML = '';
-			inputarea.appendChild(document.createTextNode(''));
-			select(0, 0);
-		}
-		selection = w.getSelection();
-		node = selection.focusNode;
-	}
-
-	var offset = selection.focusOffset;
-	var origin = node.textContent;
-
-	if (! inputarea.childNodes.length) {
-		inputarea.textContent = text;
-	} else {
-		node.textContent = origin.substring(0, offset) + text + origin.substring(offset);
-		node = node.childNodes[0] || node;
-	}
-
-	onresize();
-	count();
-
-	if (node === inputarea) {
-		node = inputarea.childNodes[0];
-	}
-
-	var range = document.createRange();
-	var pos = offset + text.length;
-	range.setStart(node, pos);
-	range.setEnd(node, pos);
-
-	selection.removeAllRanges();
-	selection.addRange(range);
-}, false);
-
 w.addEventListener('unload', function() {
 	ajax && ajax.cancel();
 }, false);
