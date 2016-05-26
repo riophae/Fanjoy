@@ -15,6 +15,15 @@ setupConsumer({
 	secret: '912d175718e5af2ea126b64981927a81'
 });
 
+Ripple.shorten['t.cn'] = function(long_url) {
+	return Ripple.ajax.get('http://api.t.sina.com.cn/short_url/shorten.json', {
+		params: {
+			source: 850454853,
+			url_long: long_url
+		}
+	});
+}
+
 function onMessage(msg, sender, sendResponse) {
 	var tab = sender.tab;
 	if (! tab) return;
@@ -200,7 +209,7 @@ function closeAllPopup() {
 }
 
 function broadcast(callback) {
-	ct.query({ 
+	ct.query({
 		url: [
 			'http://*/*',
 			'https://*/*'
