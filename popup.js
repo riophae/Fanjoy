@@ -112,9 +112,13 @@ inner.style.maxHeight = Fanjoy.defaultStyle.maxContentHeight + 'px';
 inputarea.addEventListener('input', onresize, false);
 inputarea.addEventListener('keyup', throttle(count, 100), false);
 inputarea.addEventListener('keydown', throttle(function(e) {
-	if (e.ctrlKey && e.keyCode === 13) {
-		button.click();
-	}
+	var modifierKey = e.metaKey || e.ctrlKey;
+	if (!modifierKey) return;
+	var keys = [e.metaKey, e.ctrlKey, e.shiftKey, e.altKey];
+	if (keys.filter(Boolean).length > 1) return;
+	if (e.keyCode !== 13) return;
+	e.preventDefault();
+	button.click();
 }, 100), false);
 wrapper.addEventListener('dblclick', submit, false);
 button.addEventListener('click', submit, false);
