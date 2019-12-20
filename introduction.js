@@ -44,7 +44,7 @@ $('feedback').addEventListener('click', function(e) {
 }, false);
 
 $('recommend').addEventListener('click', function(e) {
-	shareMessage(e, '我正在用 @锐风 开发的有饭同享, 很赞的 Chrome 扩展! 分享网页/图片非常方便! http://is.gd/fanjoy');
+	shareMessage(e, '我正在用 @锐风 开发的有饭同享, 很赞的 Chrome 扩展! 分享网页/图片非常方便! https://is.gd/fanjoy');
 }, false);
 
 if (! is_windows) {

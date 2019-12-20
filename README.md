@@ -3,11 +3,11 @@ Fanjoy
 
 **有饭同享:** 通过右键 拖拽/菜单 分享 网页/图片/文字/链接 到饭否的 Chrome 扩展. 支持图片直接上传, 自定义模板, 自动压缩链接, 分享其他扩展中的资源等功能.
 
-**作者:** @锐风 http://fanfou.com/ruif
+**作者:** @锐风 https://fanfou.com/ruif
 
 安装
 --
-http://is.gd/fanjoy
+https://is.gd/fanjoy
 
 版本历史
 ----

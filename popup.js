@@ -39,8 +39,8 @@ var http_s_url = "https?://(((((([0-9a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([0
 var ftp_url = "ftp://(((((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|;|\\?|&|=)*)(:(((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|;|\\?|&|=)*)){0,1}@){0,1}(((((([0-9a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([0-9a-zA-Z]))\\.)*(([a-zA-Z])(([0-9a-zA-Z])|-)*([0-9a-zA-Z])|([a-zA-Z])))|([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+))(:([0-9]+)){0,1}))(/((((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|\\?|:|@|&|=)*)(/(((([0-9a-zA-Z]|(\\$|-|_|\\.|\\+)|(!|\\*|'|\\(|\\)|,))|(%([0-9a-fA-F])([0-9a-fA-F])))|\\?|:|@|&|=)*))*)(;type=(A|I|D|a|i|d))?)?";
 var url_patt = '(' + http_s_url + ')|(' + ftp_url + ')';
 var url_re = new RegExp(url_patt, 'g');
-var url_max_len = 35;
-var url_placeholder = 'http://is.gd/xxxxxx';
+var url_max_len = 40;
+var url_placeholder = 'https://fan.fo/abcdef';
 
 function forEach(arr, func, context) {
 	return Array.prototype.forEach.call(arr, func, context);
@@ -321,10 +321,11 @@ function submit() {
 	setContent(inputarea.textContent);
 
 	checkPhoto().
-	next(shorten).
+	// next(shorten).
+	next(checkLength).
 	next(post).
 	next(Fanjoy.setSuccessCount).
-	next(checkSuccessCount).
+	// next(checkSuccessCount).
 	next(closePopup).
 	error(function(e) {
 		var error = e.status ?
@@ -351,59 +352,58 @@ function submit() {
 }
 
 function checkPhoto() {
-	if (! data.img_data || data.img_data.size <= 2 * 1024 * 1024) {
+	if (! data.img_data || data.img_data.size <= 3 * 1024 * 1024) {
 		return Deferred.next();
 	}
 	var d = new Deferred;
-	showInquiry('您将要分享的图片大小超过 2M, 可能会上传失败. 确定继续吗?', d.call.bind(d), noop);
+	showInquiry('您将要分享的图片大小超过 3M, 可能会上传失败. 确定继续吗?', d.call.bind(d), noop);
 	return d;
 }
 
-function shorten(links, force) {
-	disableButton('Shortening..', '正在缩短网址');
+// function shorten(links, force) {
+// 	disableButton('Shortening..', '正在缩短网址');
+//
+// 	var result = w.result = links || inputarea.textContent.match(url_re) || [];
+// 	var dl = [];
+// 	var ignored = [];
+//
+// 	[].forEach.call(result, function(link) {
+// 		if (link.length <= url_max_len) {
+// 			if (! force && link.length > url_placeholder.length) {
+// 				ignored.push(link);
+// 				return;
+// 			}
+// 			if (! force) return;
+// 		}
+// 		var d = Ripple.shorten['t.cn'](link).hold(log).
+// 			next(function(res) {
+// 				var short_url = res && res[0] && res[0].url_short;
+// 				if (short_url) {
+// 					setContent(inputarea.textContent.replace(link, short_url));
+// 				}
+// 			}).
+// 			error(function(e) {
+// 				if (e && ! e.status) {
+// 					ignored.push(link);
+// 				}
+// 			});
+// 		dl.push(d);
+// 	});
+// 	dl = Deferred.parallel(dl);
+//
+// 	return dl;
+// }
 
-	var result = w.result = links || inputarea.textContent.match(url_re) || [];
-	var dl = [];
-	var ignored = [];
+// function test() {
+// 	return shorten().next(function(){alert('test');}).next(enableButton);
+// }
 
-	[].forEach.call(result, function(link) {
-		if (link.length <= url_max_len) {
-			if (! force && link.length > url_placeholder.length) {
-				ignored.push(link);
-				return;
-			}
-			if (! force) return;
-		}
-		var d = Ripple.shorten['t.cn'](link).hold(log).
-			next(function(res) {
-				var short_url = res && res[0] && res[0].url_short;
-				if (short_url) {
-					setContent(inputarea.textContent.replace(link, short_url));
-				}
-			}).
-			error(function(e) {
-				if (e && ! e.status) {
-					ignored.push(link);
-				}
-			});
-		dl.push(d);
-	});
-	dl = Deferred.parallel(dl);
-	dl = dl.next(function() {
-		if (inputarea.textContent.length <= 140) return;
-		if (ignored.length) {
-			return shorten(ignored, true);
-		}
-		var d = new Deferred;
-		var msg = '字数超过 140 字, 如果直接发送, 消息将被截断. 确定要这样做吗?';
-		showInquiry(msg, d.call.bind(d), enableButton);
-		return d;
-	});
-	return dl;
-}
-
-function test() {
-	return shorten().next(function(){alert('test');}).next(enableButton);
+function checkLength() {
+	if (inputarea.textContent.length <= 140) return;
+	var d = new Deferred();
+	var msg = '字数超过 140 字, 如果直接发送, 消息将被截断. 确定要这样做吗?';
+	showInquiry(msg, d.call.bind(d), enableButton);
+	return d;
 }
 
 function post() {
@@ -650,24 +650,24 @@ function focusOnPopup() {
 	});
 }
 
-function checkSuccessCount() {
-	var count = Fanjoy.getSuccessCount();
-	if (count === 5) {
-		var d = new Deferred;
-		var msg = '您已经成功分享了 5 次! 如果喜欢这个扩展, 请给它打个 5 星!';
-		var agreed = function() {
-			Fanjoy.showExtHomePage();
-			closePopup();
-		}
-		showInquiry(msg, agreed, d.call.bind(d));
-		return d;
-	}
-}
+// function checkSuccessCount() {
+// 	var count = Fanjoy.getSuccessCount();
+// 	if (count === 5) {
+// 		var d = new Deferred;
+// 		var msg = '您已经成功分享了 5 次! 如果喜欢这个扩展, 请给它打个 5 星!';
+// 		var agreed = function() {
+// 			Fanjoy.showExtHomePage();
+// 			closePopup();
+// 		}
+// 		showInquiry(msg, agreed, d.call.bind(d));
+// 		return d;
+// 	}
+// }
 
 function switchAccount() {
 	Deferred.next(function() {
 		reset_inner.innerHTML = '<p>正在检查, 请稍等..</p>';
-		return Ripple.ajax.get('http://m.fanfou.com/');
+		return Ripple.ajax.get('https://m.fanfou.com/');
 	}).
 	next(function(html) {
 		var re = /1<a href="\/([^"]+)"[^>]+accesskey="1">空间<\/a>/i;
@@ -702,7 +702,7 @@ function switchAccount() {
 			$('logoutFF').addEventListener('click', function logout_onclick() {
 				var logout_btn = this;
 				if (logout_btn.classList.contains('disabled')) return;
-				var url = 'http://m.fanfou.com' + html.match(/<a href="(\/logout\/[^"]+)">/)[1];
+				var url = 'https://m.fanfou.com' + html.match(/<a href="(\/logout\/[^"]+)">/)[1];
 				Ripple.ajax(url, {
 					onstart: function() {
 						logout_btn.classList.add('disabled');

@@ -15,15 +15,6 @@ setupConsumer({
 	secret: '912d175718e5af2ea126b64981927a81'
 });
 
-Ripple.shorten['t.cn'] = function(long_url) {
-	return Ripple.ajax.get('http://api.t.sina.com.cn/short_url/shorten.json', {
-		params: {
-			source: 850454853,
-			url_long: long_url
-		}
-	});
-}
-
 function onMessage(msg, sender, sendResponse) {
 	var tab = sender.tab;
 	if (! tab) return;
@@ -460,7 +451,7 @@ var Fanjoy = this.Fanjoy = {
 		lscache.set('success_count', ++count);
 	},
 	showLogin: function() {
-		createTab('http://fanfou.com/login');
+		createTab('https://fanfou.com/login');
 	},
 	showExtHomePage: function() {
 		createTab('https://chrome.google.com/webstore/detail/fkabhbjhcdoccohpojphgofmlljekcgg/reviews');
