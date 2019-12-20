@@ -34,7 +34,11 @@ function onMessage(msg, sender, sendResponse) {
 			if (tab.url.indexOf(ce.getURL('')) == 0) {
 				ct.sendMessage(tab.id, {
 					type: 'do',
-					code: code
+					code: code,
+					data: {
+						type: 'init-settings',
+						value: settings.current
+					}
 				});
 			} else {
 				ct.executeScript(tab.id, {
@@ -135,13 +139,15 @@ function setupContextMenus() {
 			title: onContextmenus[type][0],
 			onclick: function(info, tab) {
 				var code = onContextmenus[type][1].call(this, info, tab);
+				var data = onContextmenus[type][2].call(this, info, tab);
 				var url = tab.url;
 				if (url.indexOf('http://') != 0 && url.indexOf('https://') != 0) {
 					if (url.indexOf(root_url) == 0) {
 						if (url != root_url + 'introduction.html') return;
 						ct.sendMessage(tab.id, {
 							type: 'do',
-							code: code
+							code: code,
+							data: data
 						});
 					} else {
 						createPopup({
@@ -383,18 +389,52 @@ function getSerilizedSettings() {
 
 // 上下文菜单细节
 var onContextmenus = {
-	selection: ['有饭同享: %s', function(info, tab) {
-		return 'shareSelection(true);';
-	}],
-	image: ['有饭同享: 分享图片', function(info, tab) {
-		return 'shareImage("' + info.srcUrl + '");';
-	}],
-	link: ['有饭同享: 分享链接', function(info, tab) {
-		return 'shareLink("' + info.linkUrl + '");';
-	}],
-	page: ['有饭同享: 分享页面', function(info, tab) {
-		return 'shareSelection(true);';
-	}]
+	selection: [
+		'有饭同享: %s',
+		function(info, tab) {
+			return 'shareSelection(true);';
+		},
+		function(info, tab) {
+			return {
+				type: 'selection'
+			};
+		}
+	],
+	image: [
+		'有饭同享: 分享图片',
+		function(info, tab) {
+			return 'shareImage("' + info.srcUrl + '");';
+		},
+		function(info, tab) {
+			return {
+				type: 'image',
+				url: info.srcUrl
+			};
+		}
+	],
+	link: [
+		'有饭同享: 分享链接',
+		function(info, tab) {
+			return 'shareLink("' + info.linkUrl + '");';
+		},
+		function(info, tab) {
+			return {
+				type: 'link',
+				url: info.linkUrl
+			}
+		}
+	],
+	page: [
+		'有饭同享: 分享页面',
+		function(info, tab) {
+			return 'shareSelection(true);';
+		},
+		function(info, tab) {
+			return {
+				type: 'selection'
+			};
+		}
+	]
 };
 
 var settings = {
