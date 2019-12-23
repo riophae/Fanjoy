@@ -664,20 +664,28 @@ function focusOnPopup() {
 // 	}
 // }
 
+function parseHTML(html) {
+  var parser = new DOMParser();
+  var document = parser.parseFromString(html, 'text/html');
+
+  return document;
+}
+
 function switchAccount() {
 	Deferred.next(function() {
 		reset_inner.innerHTML = '<p>正在检查, 请稍等..</p>';
-		return Ripple.ajax.get('https://m.fanfou.com/');
+		return Ripple.ajax.get('https://fanfou.com/home');
 	}).
 	next(function(html) {
-		var re = /1<a href="\/([^"]+)"[^>]+accesskey="1">空间<\/a>/i;
-		var result = (html + '').match(re);
+		var document = parseHTML(html);
+		var userProfilePageLink = document.querySelector('#navigation ul li:nth-of-type(2) a');
+		var isLoggedIn = userProfilePageLink.textContent === '我的空间';
 		var current_id; // 在饭否登录的账号 ID
 		var code = '';
 
-		if (result) {
-			current_id = decodeURIComponent(result[1]);
-			var current_name = html.match(/<title> 饭否 \| 欢迎你，(.+)<\/title>/)[1];
+		if (isLoggedIn) {
+			current_id = decodeURIComponent(userProfilePageLink.pathname.replace('/', ''));
+			var current_name = document.querySelector('#user_top h3').textContent.trim();
 			code += '<p>';
 			code += '当前登录账号为 <strong>' + current_name + '</strong>, ';
 			code += current_id == Fanjoy.account.id ?
@@ -702,7 +710,10 @@ function switchAccount() {
 			$('logoutFF').addEventListener('click', function logout_onclick() {
 				var logout_btn = this;
 				if (logout_btn.classList.contains('disabled')) return;
-				var url = 'https://m.fanfou.com' + html.match(/<a href="(\/logout\/[^"]+)">/)[1];
+ 				var url = document.querySelector('#navigation a[href*="/logout/"]').href;
+				if (url.startsWith('chrome-extension://')) {
+					url = url.replace('chrome-extension://', 'https://');
+				}
 				Ripple.ajax(url, {
 					onstart: function() {
 						logout_btn.classList.add('disabled');
