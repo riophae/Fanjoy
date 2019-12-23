@@ -22,6 +22,6 @@
 	"name": "\u6709\u996D\u540C\u4EAB",
 	"permissions": [ "tabs", "contextMenus", "http://*/", "https://*/" ],
 	"content_security_policy": "script-src 'self'; object-src 'self'; connect-src 'self' https://fanfou.com https://api.fanfou.com",
-	"version": "0.4.1",
+	"version": "0.4.2",
 	"manifest_version": 2
 }
